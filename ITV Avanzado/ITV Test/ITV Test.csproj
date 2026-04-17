@@ -32,5 +32,8 @@
     <ItemGroup>
         <ProjectReference Include="..\ITV Avanzado\ITV Avanzado.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Config\" />
+    </ItemGroup>
 
 </Project>
