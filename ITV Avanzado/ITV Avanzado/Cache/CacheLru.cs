@@ -50,9 +50,17 @@ public class CacheLru<TKey, TValue> : ICache<TKey, TValue>
         RefreshUsage(key);
         _logger.Debug("Nueva Cache despues de la actualizacion: {Order}",
             string.Join(" -> ", _usageOrder));
-        return value;    }
-
+        return value;    
+    }
+    /// <inheritdoc cref="ICache{TKey,TValue}.Remove" />
     public bool Remove(TKey key) {
-        throw new NotImplementedException();
+        _logger.Debug("Eliminando clave de la Cache: {Key}", key);
+        if (!_data.Remove(key)) {
+            _logger.Debug("Clave {Key} de la Cache no encontrada", key);
+            return false;
+        }
+        _usageOrder.Remove(key);
+        _logger.Debug("Clave {Key} de la Cache borrado correctamente", key);
+        return true;
     }
 }
