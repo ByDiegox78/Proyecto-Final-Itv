@@ -63,5 +63,15 @@ public class CacheLruTest {
             _cache.Get(1).Should().Be("Alfa");
         }
     }
+    [TestFixture]
+    public class CasosNegativos {
+        [Test]
+        public void Contructor_CapacidadCero_LanzaExcepcion() {
+            var action = () => new CacheLru<int, string>(0);
+
+            // Assert
+            action.Should().Throw<ArgumentException>();
+        }
+    }
     
 }
