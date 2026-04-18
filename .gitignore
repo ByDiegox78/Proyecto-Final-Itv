@@ -32,6 +32,7 @@ artifacts/
 publish/
 TestResults/
 BenchmarkDotNet.Artifacts/
+coveragereport/
 
 # Archivos específicos de Visual Studio
 *.csproj.user
