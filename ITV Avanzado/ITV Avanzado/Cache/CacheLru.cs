@@ -38,9 +38,19 @@ public class CacheLru<TKey, TValue> : ICache<TKey, TValue>
         _logger.Debug("Se añadio el elemnto, La nueva cache es: {Order}",
             string.Join(" -> ", _usageOrder));    }
 
+    /// <inheritdoc cref="ICache{TKey,TValue}.Get" />
     public TValue? Get(TKey key) {
-        throw new NotImplementedException();
-    }
+        _logger.Debug("Buscando clave: {Key}", key);
+        if (!_data.TryGetValue(key, out var value)) {
+            _logger.Debug("Clave {Key} NO encontrada en cache", key);
+            return default;
+        }
+        _logger.Debug("Clave {Key} encontrada: {Value}. Refrescando la Cache...",
+            key, value);
+        RefreshUsage(key);
+        _logger.Debug("Nueva Cache despues de la actualizacion: {Order}",
+            string.Join(" -> ", _usageOrder));
+        return value;    }
 
     public bool Remove(TKey key) {
         throw new NotImplementedException();
