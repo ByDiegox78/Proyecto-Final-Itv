@@ -63,4 +63,14 @@ public class CacheLru<TKey, TValue> : ICache<TKey, TValue>
         _logger.Debug("Clave {Key} de la Cache borrado correctamente", key);
         return true;
     }
+    /// <summary>
+    ///     Mueve una clave existente a la última posición de la lista de uso.
+    ///     Este método es el corazón del algoritmo LRU.
+    /// </summary>
+    /// <param name="key">La clave del elemento que acaba de ser utilizado.</param>
+    private void RefreshUsage(TKey key) {
+        _logger.Verbose("[LRU-REFRESH] Moviendo clave {Key} al final de la lista", key);
+        _usageOrder.Remove(key);
+        _usageOrder.AddLast(key);
+    }
 }
