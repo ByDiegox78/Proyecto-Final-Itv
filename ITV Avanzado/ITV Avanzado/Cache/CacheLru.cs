@@ -73,4 +73,11 @@ public class CacheLru<TKey, TValue> : ICache<TKey, TValue>
         _usageOrder.Remove(key);
         _usageOrder.AddLast(key);
     }
+    
+    /// <inheritdoc cref="ICache{TKey,TValue}.DisplayStatus" />
+    public void DisplayStatus() {
+        _logger.Information("[LRU-STATUS] Capacidad: {Used}/{Total}", _data.Count, _capacity);
+        _logger.Information("[LRU-STATUS] Uso (Menos reciente -> Más reciente): {Order}",
+            string.Join(" -> ", _usageOrder));
+    }
 }

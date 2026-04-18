@@ -25,4 +25,8 @@ public interface ICache<in TKey, TValue> where TKey : notnull  {
     /// <param name="key">Clave del elemento</param>
     /// <returns>Devuelve true si se elimino y falso si no existia</returns>
     bool Remove(TKey key);
+    /// <summary>
+    /// Muestra el status actual de la cache.
+    /// </summary>
+    void DisplayStatus();
 }
