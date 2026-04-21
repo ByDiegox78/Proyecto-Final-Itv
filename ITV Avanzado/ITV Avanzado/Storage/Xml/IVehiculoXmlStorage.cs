@@ -1,5 +1,8 @@
-﻿namespace ITV_Avanzado.Storage.Xml;
+﻿using GestionItv.Models;
+using ITV_Avanzado.Storage.Common;
 
-public interface IVehiculoXmlStorage {
+namespace ITV_Avanzado.Storage.Xml;
+
+public interface IVehiculoXmlStorage : IStorage<Vehiculo> {
     
 }

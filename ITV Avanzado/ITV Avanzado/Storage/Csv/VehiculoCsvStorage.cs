@@ -43,13 +43,9 @@ public class VehiculoCsvStorage : IVehiculoCsvStorage {
             return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.FileNotFound(path));
         }
         try {
-            //Leemos el archvo linea a linea
             var vehiculos = File.ReadLines(path, Encoding.UTF8)
-                //Ignoramos la 1 linea
                 .Skip(1)
-                //Convierte cada linea en un array cuando encuentre: ";"
                 .Select(linea => linea.Split(';'))
-                //Construye el objeto Dto con los campos
                 .Select(campos => new VehiculoDto(
                     int.Parse(campos[0]),
                     campos[1],
