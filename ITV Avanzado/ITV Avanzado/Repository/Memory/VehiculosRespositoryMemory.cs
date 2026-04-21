@@ -3,6 +3,7 @@ using GestionItv.Models;
 using ITV_Avanzado.Config;
 using ITV_Avanzado.Error.Common;
 using ITV_Avanzado.Error.Vehiculos;
+using ITV_Avanzado.Factory;
 using ITV_Avanzado.Repository.Common;
 using Serilog;
 
