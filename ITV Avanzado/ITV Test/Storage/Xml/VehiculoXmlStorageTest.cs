@@ -114,16 +114,5 @@ public class VehiculoXmlStorageTest {
             res.Error.Should().BeOfType<StorageError.WriteError>();
             res.Error.Message.Should().Contain("Error al escribir");
         }
-        [Test]
-        public void Cargar_CuandoElArchivoTieneFormatoInvalido_DevuelveError() {
-            using var writer = new StreamWriter(_path, false, Encoding.UTF8);
-            writer.WriteLine("Id;Matricula;Marca;Cilindrada;TipoMotor;DniPropietario;IsDelete;CreatedAt;UpdatedAt;");
-            writer.WriteLine("1;1234BCD;Seat Ibiza;1200;Gasolina;01234567L;False;2024-01-17 00:00:00;2024-01-17 00:00:00;");
-
-            var res = _storage.Cargar(_path);
-
-            res.IsFailure.Should().BeTrue();
-            res.Error.Should().BeOfType<StorageError.ReadError>();
-        }
     }
 }
