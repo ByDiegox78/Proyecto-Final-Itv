@@ -27,7 +27,8 @@ public class AppConfigTest {
             var tipo = AppConfig.RepositoryType;
 
             tipo.Should().NotBeNullOrEmpty();
-            tipo.ToLower().Should().BeOneOf("json", "ado","dapper", "efcore", "bin", "memory");
+            tipo.ToLower().Should().BeOneOf("json", "ado","dapper", "efcore", "binary", "memory");
+            tipo.Should().BeLowerCased();
         }
         [Test]
         public void ConnectionString_RetornarValorNoNulo() {
