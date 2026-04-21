@@ -8,7 +8,7 @@ using ITV_Avanzado.Mapper;
 namespace ITV_Test.Mapper;
 
 [TestFixture]
-public class VehiculoMapperTest {
+public static class VehiculoMapperTest {
     [TestFixture]
     public class CasosPositivos {
         [SetUp]
