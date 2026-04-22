@@ -5,8 +5,8 @@ using ITV_Avanzado.Error.Storage;
 using ITV_Avanzado.Storage.Json;
 
 namespace ITV_Test.Storage.Json;
-
-public class VehiculoXmlStorageTest {
+[TestFixture]
+public class VehiculoJsonStorageTest {
     [SetUp]
     public void SetUp() {
         _storage = new VehiculoJsonStorage();
