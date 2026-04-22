@@ -54,8 +54,12 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
     }
     public Result<Vehiculo, DomainError> Create(Vehiculo vehiculo) {
         _logger.Debug("Creando un vehiculo {Entity}", vehiculo);
-        if (_matricula.ContainsKey(vehiculo.Matricula) || !VerificarCochePropietario(vehiculo.DniPropietario)) 
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists("El vehiculo ya existe o el propietario tiene 3 vehiculos a su disposicion"));
+        if (_matricula.ContainsKey(vehiculo.Matricula)) {
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists("La matricula del vehiculo ya se en encuenta en uso"));
+        }
+        if (!VerificarCochePropietario(vehiculo.DniPropietario)) {
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists("El propietario no puede incluir este vehiculo porque ya tiene 3 a su disposicion"));
+        }
         
         var nuevo = vehiculo with {
             Id = ++_idCounter,
@@ -80,13 +84,13 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
         if (vehiculo.Matricula != actual.Matricula && _matricula.TryGetValue(vehiculo.Matricula, out var otroId) && otroId != id) {
             _logger.Warning("No se puede actualizar el vehículo con id {Id} porque la matrícula {Matricula} ya está en uso por otro vehículo",
                 id, vehiculo.Matricula); 
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(id.ToString()));
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
 
         }
         if (vehiculo.DniPropietario != actual.DniPropietario) {
             if (!VerificarCochePropietario(vehiculo.DniPropietario)) {
                 _logger.Warning("El propietario con DNI {Dni} ya tiene 3 vehículos", vehiculo.DniPropietario);
-                return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));;
+                return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
             }
             QuitarVehiculoDni(actual.DniPropietario,actual.Id);
             AgregarVehiculoDni(vehiculo.DniPropietario, id);
