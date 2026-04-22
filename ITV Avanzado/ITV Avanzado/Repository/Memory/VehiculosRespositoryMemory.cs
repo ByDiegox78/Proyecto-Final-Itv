@@ -31,7 +31,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
             _logger.Information("SeedData completado.");
         }
     }
-    
     public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
         _logger.Debug(
             "Obteniendo vehiculos con paginación: página {Page}, tamaño {PageSize}, incluir borrados: {IncludeDeleted}",
@@ -46,7 +45,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
     }
-
     public Vehiculo? GetById(int id) {
         _logger.Debug("Buscando vehiculo por su matricula: {Id}", id);
         return _porId.GetValueOrDefault(id);
@@ -73,7 +71,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
         _logger.Information("Persona creada con ID {Id}", nuevo.Id);
         return Result.Success<Vehiculo, DomainError>(nuevo);
     }
-
     public Result<Vehiculo, DomainError> Update(int id, Vehiculo vehiculo) {
         _logger.Debug("Actualizando el vehiculo: {Entity}", vehiculo);
         if (!_porId.TryGetValue(id, out var actual)) {
@@ -109,7 +106,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
         _logger.Information("Persona con ID {Id} actualizada correctamente", id);
         return Result.Success<Vehiculo, DomainError>(actualizado);
     }
-
     public Vehiculo? Delete(int id) {
         _logger.Debug("Eliminando vehiculo con id {Id}", id);
         if (!_porId.TryGetValue(id, out var vehiculo)) {
@@ -124,17 +120,15 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
         return eliminado;
     }
     public Vehiculo? HardDelete(int id) {
-        if (!_porId.Remove(id, out var vehiculo)) {
+        if (!_porId.TryGetValue(id, out var vehiculo)) {
             _logger.Warning("No se puede eliminar: vehiculo con id {Id} no encontrado", id);
             return null;
         }
-
+        _porId.Remove(id); 
         _matricula.Remove(vehiculo.Matricula);
         QuitarVehiculoDni(vehiculo.DniPropietario, vehiculo.Id);
-    
         return vehiculo;
     }
-
     public Vehiculo? GetByMatricula(string matricula) {
         _logger.Debug("Buscando vehiculo con matricula: {matricula}", matricula);
         return _matricula.TryGetValue(matricula, out var id) &&
@@ -142,7 +136,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
             ? vehiculo
             : null;    
     }
-
     public bool DeleteAll() {
         _logger.Warning("Eliminando permanentemente todos los vehiculos");
         _matricula.Clear();
@@ -151,7 +144,27 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
         _idCounter = 0;
         return true;
     }
-    
+    public Result<Vehiculo, DomainError> Restore(int id) {
+        if (!_porId.TryGetValue(id, out var actual)) {
+            _logger.Warning("No se puede restaurar: vehiculo con id {Id} no encontrada", id);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.NotFound(id.ToString()));
+        }
+
+        var restore = actual with {
+            Id = actual.Id,
+            Matricula = actual.Matricula,
+            Marca = actual.Marca,
+            Cilindrada = actual.Cilindrada,
+            CreatedAt = actual.CreatedAt,
+            UpdatedAt = DateTime.UtcNow,
+            DniPropietario = actual.DniPropietario,
+            IsDeleted = false,
+            TipoMotor = actual.TipoMotor
+        };
+        _porId[id] = restore;
+        _logger.Information("Persona con ID {Id} restaurada correctamente", id);
+        return Result.Success<Vehiculo, DomainError>(restore);
+    }
     private bool VerificarCochePropietario(string dni) { 
         return !_porDni.TryGetValue(dni, out var list) || list.Count < 3;
     }

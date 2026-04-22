@@ -15,7 +15,16 @@ public class VehiculosRepositoryMemoryTest {
         }
 
         private VehiculosRespositoryMemory _repository = null!;
-
+        
+        
+        [Test]
+        public void Constructor_ConSeedData_CargaDatosIniciales() {
+            
+            var repoConSemilla = new VehiculosRespositoryMemory(true, true); 
+            
+            repoConSemilla.GetAll().Should().NotBeEmpty();
+        }
+        
         [Test]
         public void Create_CrearVehiculo_CreaCorrectamente() {
             var vehiculo = new Vehiculo {
@@ -170,20 +179,96 @@ public class VehiculosRepositoryMemoryTest {
                 IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
             });
             var act = new Vehiculo {
-                Matricula = "1234BCD", Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Diesel,
-                DniPropietario = "01234567L"
+                Matricula = "3456BCS", Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Diesel,
+                DniPropietario = "51234572W"
             };
             var res = _repository.Update(1, act);
 
             res.IsSuccess.Should().BeTrue();
             res.Value.Marca.Should().Be("Fiat");
             res.Value.TipoMotor.Should().Be(Motor.Diesel);
-
-
-
+        }
+        [Test]
+        public void Update_ConCambioDeDni_ActualizaCorrectamente() {
+            _repository.Create(new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
+                DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            });
+            var act = new Vehiculo {
+                Matricula = "1234BCD",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "89012345E",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var res = _repository.Update(1, act);
+            
+            res.IsSuccess.Should().BeTrue();
+            res.Value.DniPropietario.Should().Be("89012345E");
+        }
+        [Test]
+        public void Update_ConCambioDeMatricula_ActualizaCorrectamente() {
+            _repository.Create(new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
+                DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            });
+            var act = new Vehiculo {
+                Matricula = "1234BTD"
+            };
+            var res = _repository.Update(1, act);
+            
+            res.IsSuccess.Should().BeTrue();
+            res.Value.Matricula.Should().Be("1234BTD");
         }
 
-        [TestFixture]
+        [Test]
+        public void DeleteHard_EliminaVehiculoCorrectamente_DevuelveVehiculoEliminado() {
+            var vehiculo = new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", IsDeleted = false, 
+                CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo2 = new Vehiculo {
+                Matricula = "1234GPT", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", IsDeleted = false,
+                CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var v1 = _repository.Create(vehiculo).Value;
+            var v2 = _repository.Create(vehiculo2).Value;
+
+            var res = _repository.HardDelete(v2.Id);
+
+            res.Should().NotBeNull();
+            res!.Id.Should().Be(v2.Id);
+            _repository.GetById(v2.Id).Should().BeNull(); 
+            _repository.GetById(v1.Id).Should().NotBeNull();
+            _repository.GetByMatricula(v2.Matricula).Should().BeNull();
+        }
+        
+
+        [Test]
+        public void Restore_DevuelveVehiculo_DevuelveCorrectamente() {
+            
+            _repository.Create(new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
+                DniPropietario = "01234567L", IsDeleted = false,
+                CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            });
+            var vehiculo = _repository.GetById(1);
+            _repository.Delete(vehiculo.Id);
+            var res = _repository.Restore(vehiculo.Id);
+            
+            res.IsSuccess.Should().BeTrue();
+            res.Value.IsDeleted.Should().Be(false);
+            res.Value.UpdatedAt.Should().BeAfter(new DateTime(2024, 01, 17));
+            res.Value.TipoMotor.Should().Be(vehiculo.TipoMotor);
+        }
+        
+    }
+    /*
+     * ---------------
+     * CASOS NEGATIVOS
+     * ---------------
+     */
+    [TestFixture]
         public class CasosNegativos {
             [SetUp]
             public void SetUp() {
@@ -257,6 +342,31 @@ public class VehiculosRepositoryMemoryTest {
 
                 resultado.Should().BeNull();
             }
+            [Test]
+            public void GetByMatricula_VehiculoEliminado_DevuelveNull() {
+                var vehiculo = new Vehiculo {
+                    Matricula = "1234BCD",
+                    Marca = "Seat Ibiza",
+                    Cilindrada = 1200,
+                    TipoMotor = Motor.Gasolina,
+                    DniPropietario = "01234567L",
+                    IsDeleted = false
+                };
+                var creado = _repository.Create(vehiculo).Value;
+                _repository.Delete(creado.Id); 
+                var res = _repository.GetByMatricula("1234BCD");
+
+                res.Should().BeNull();
+            }
+            [Test]
+            public void GetByMatricula_NoExisteDevuelveNull() {
+                var res = _repository.GetByMatricula("4196FMR");
+
+                _repository.GetByMatricula("4196FMR").Should().BeNull();
+                res.Should().BeNull();
+            }
+            
+            
 
             [Test]
             public void Update_VehiculoNoExiste_DevuelveError() {
@@ -325,9 +435,28 @@ public class VehiculosRepositoryMemoryTest {
                 
                 res.IsFailure.Should().BeTrue();
                 res.Error.Should().BeOfType<VehiculoError.MaxVehiculosUsageDniError>();
-                (res.Error as VehiculoError.MaxVehiculosUsageDniError)?
-                    .dni.Should().Be("41234571X");
+                (res.Error as VehiculoError.MaxVehiculosUsageDniError)?.Details.Should().Be("41234571X");
             }
+            
+            [Test]
+            public void Delete_CuandoNoExiste_DeberiaRetornarNull() {
+                var res = _repository.Delete(1);
+                
+                res.Should().BeNull();
+            }
+            [Test]
+            public void HardDelete_CuandoNoExiste_DeberiaRetornarNull() {
+                var res = _repository.HardDelete(1);
+
+                res.Should().BeNull();
+            }
+            [Test]
+            public void Restore_VehiculoNoExiste_DevuelveError() {
+                var res = _repository.Restore(999);
+
+                res.IsFailure.Should().BeTrue();
+                res.Error.Should().BeOfType<VehiculoError.NotFound>();
+            }
+        
         }
-    }
 }

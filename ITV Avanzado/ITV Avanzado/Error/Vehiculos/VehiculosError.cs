@@ -39,7 +39,7 @@ public static class VehiculoErrors {
         return new VehiculoError.StorageError(details);
     }
     public static DomainError MaxVehiculosUsageDniError(string details) {
-        return new VehiculoError.StorageError(details);
+        return new VehiculoError.MaxVehiculosUsageDniError(details);
     }
     
 }

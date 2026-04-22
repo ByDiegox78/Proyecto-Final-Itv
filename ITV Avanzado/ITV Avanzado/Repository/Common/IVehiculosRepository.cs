@@ -46,6 +46,8 @@ public interface IVehiculosRepository {
     /// <returns></returns>
     Vehiculo? HardDelete(int id);
 
-    
+    Result<Vehiculo, DomainError> Restore(int id);
+
+
 
 }
