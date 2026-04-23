@@ -14,7 +14,7 @@ public class VehiculoBinaryRepositoryTest {
             _temp = Path.GetTempFileName();
             if (File.Exists(_temp)) File.Delete(_temp); 
     
-            _repository = new VehiculoBinaryRepository(_temp);
+            _repository = new VehiculoBinaryRepository(_temp, true, false);
         }
 
         [TearDown]
@@ -38,7 +38,7 @@ public class VehiculoBinaryRepositoryTest {
         public void Constructor_DropDataYFileExiste_EliminaCorrectamente() {
             var tempFile = Path.GetTempFileName();
             File.WriteAllText(tempFile, "datos previos");
-            var res = new VehiculoBinaryRepository(tempFile, dropData: true);
+            var res = new VehiculoBinaryRepository(tempFile, dropData: true, seedData: false);
             
             res.GetAll().Should().BeEmpty();
             
@@ -198,14 +198,14 @@ public class VehiculoBinaryRepositoryTest {
     }
 
     [TestFixture]
-        public class Casos_Positios {
+        public class CasosNegativos {
             [SetUp]
             public void SetUp() {
                 _temp = Path.GetTempFileName();
     
                 if (File.Exists(_temp)) File.Delete(_temp); 
     
-                _repository = new VehiculoBinaryRepository(_temp);
+                _repository = new VehiculoBinaryRepository(_temp, dropData: true, seedData: false);
             }
 
             [TearDown]

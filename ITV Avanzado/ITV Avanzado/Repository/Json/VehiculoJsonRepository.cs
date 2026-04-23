@@ -24,7 +24,7 @@ public class VehiculoJsonRepository : IVehiculosRepository{
     
     private readonly string _filePath;
     
-    public VehiculoJsonRepository(string filePath, bool dropData = false, bool seedData = false) {
+    public VehiculoJsonRepository(string filePath, bool dropData, bool seedData) {
         _filePath = filePath;
         EnsureDirectory();
 

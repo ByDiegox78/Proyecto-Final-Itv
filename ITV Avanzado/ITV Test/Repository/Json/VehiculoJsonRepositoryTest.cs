@@ -13,7 +13,7 @@ public class VehiculoJsonRepositoryTest {
         [SetUp]
         public void SetUp() {
             _temp = Path.GetTempFileName();
-            _repository = new VehiculoJsonRepository(_temp);
+            _repository = new VehiculoJsonRepository(_temp, true, false);
             _repository.DeleteAll();
         }
 
@@ -287,10 +287,9 @@ public class VehiculoJsonRepositoryTest {
             [SetUp]
             public void SetUp() {
                 _temp = Path.GetTempFileName();
-                _repository = new VehiculoJsonRepository(_temp);
+                _repository = new VehiculoJsonRepository(_temp, true, false);
                 _repository.DeleteAll();
             }
-
             [TearDown]
             public void TearDown() {
                 if (File.Exists(_temp))

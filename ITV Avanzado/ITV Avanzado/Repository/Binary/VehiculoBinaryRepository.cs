@@ -22,7 +22,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
     
     private readonly string _filePath;
     
-    public VehiculoBinaryRepository(string filePath, bool dropData = false, bool seedData = false) {
+    public VehiculoBinaryRepository(string filePath, bool dropData, bool seedData) {
         EnsureDataFolder();
         _filePath = filePath;
         if (dropData && File.Exists(_filePath)) {

@@ -16,8 +16,6 @@ public class VehiculosRespositoryMemory : IVehiculosRepository{
     private readonly Dictionary<int, Vehiculo> _porId = new();
     private readonly Dictionary<string, HashSet<int>> _porDni = new();
     private int _idCounter;
-
-    public VehiculosRespositoryMemory() : this(AppConfig.DropData, AppConfig.SeedData) { }
     
     public VehiculosRespositoryMemory(bool dropData, bool seedData) {
         if (dropData) {
