@@ -8,12 +8,13 @@ namespace ITV_Test.Repository.Binary;
 [TestFixture]
 public class VehiculoBinaryRepositoryTest {
     [TestFixture]
-    public class Casos_Positios {
+    public class CasosPositios {
         [SetUp]
         public void SetUp() {
             _temp = Path.GetTempFileName();
+            if (File.Exists(_temp)) File.Delete(_temp); 
+    
             _repository = new VehiculoBinaryRepository(_temp);
-            _repository.DeleteAll();
         }
 
         [TearDown]
@@ -36,11 +37,11 @@ public class VehiculoBinaryRepositoryTest {
         [Test]
         public void Constructor_DropDataYFileExiste_EliminaCorrectamente() {
             var tempFile = Path.GetTempFileName();
-            File.WriteAllText(tempFile, "prueba");
-            var repoConSemilla = new VehiculoBinaryRepository(tempFile, true, true);
-            if (File.Exists(_temp)) File.Delete(_temp);
-
-            File.Exists(_temp).Should().BeFalse();
+            File.WriteAllText(tempFile, "datos previos");
+            var res = new VehiculoBinaryRepository(tempFile, dropData: true);
+            
+            res.GetAll().Should().BeEmpty();
+            
 
         }
 
@@ -197,14 +198,14 @@ public class VehiculoBinaryRepositoryTest {
     }
 
     [TestFixture]
-    public class CasosNegativos {
-        [TestFixture]
         public class Casos_Positios {
             [SetUp]
             public void SetUp() {
                 _temp = Path.GetTempFileName();
+    
+                if (File.Exists(_temp)) File.Delete(_temp); 
+    
                 _repository = new VehiculoBinaryRepository(_temp);
-                _repository.DeleteAll();
             }
 
             [TearDown]
@@ -360,6 +361,4 @@ public class VehiculoBinaryRepositoryTest {
                 res.Error.Should().BeOfType<VehiculoError.NotFound>();
             }
         }
-
-    }
 }

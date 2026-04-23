@@ -14,7 +14,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
     private const string FilePath = "Data/vehiculos_sec.dat";
     private readonly ILogger _logger = Log.ForContext<VehiculoBinaryRepository>();
 
-    private static int _nextId = 1;
+    private int _nextId;
     
     private readonly Dictionary<string, int> _matricula = new();
     private readonly Dictionary<int, Vehiculo> _porId;
@@ -23,6 +23,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
     private readonly string _filePath;
     
     public VehiculoBinaryRepository(string filePath, bool dropData = false, bool seedData = false) {
+        EnsureDataFolder();
         _filePath = filePath;
         if (dropData && File.Exists(_filePath)) {
             File.Delete(_filePath);
@@ -40,11 +41,11 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
    
 
     private Dictionary<int, Vehiculo> Load() {
-        if (!File.Exists(FilePath)) {
+        if (!File.Exists(_filePath)) {
             return new Dictionary<int, Vehiculo>();
         }
 
-        using var stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
+        using var stream = new FileStream(_filePath, FileMode.Open, FileAccess.Read);
         using var reader = new BinaryReader(stream, Encoding.UTF8);
 
         var cantidad = reader.ReadInt32();
@@ -73,7 +74,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
     }
 
     private void Save() {
-        using var stream = new FileStream(FilePath, FileMode.Create, FileAccess.Write);
+        using var stream = new FileStream(_filePath, FileMode.Create, FileAccess.Write);
         using var writer = new BinaryWriter(stream, Encoding.UTF8);
         
         writer.Write(_porId.Count);
@@ -219,7 +220,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
         _matricula.Clear(); 
         _porDni.Clear();
         _nextId = 0;
-        if (File.Exists(FilePath)) File.Delete(FilePath);
+        if (File.Exists(_filePath)) File.Delete(_filePath);
         _logger.Information("Repositorio BIN limpiado.");
         return true;
     }
@@ -255,5 +256,10 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
         _logger.Information("Persona con ID {Id} restaurada correctamente", id);
         Save();
         return Result.Success<Vehiculo, DomainError>(restore);
+    }
+    private void EnsureDataFolder() {
+        if (!Directory.Exists(AppConfig.DataFolder)) {
+            Directory.CreateDirectory(AppConfig.DataFolder);
+        }
     }
 }
