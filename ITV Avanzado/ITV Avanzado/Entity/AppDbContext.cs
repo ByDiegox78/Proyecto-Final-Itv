@@ -11,6 +11,10 @@ public class AppDbContext : DbContext {
         _connectionString = "";
     }
     
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
+        _connectionString = "";
+    }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder op) {
         if (!op.IsConfigured) op.UseSqlite(_connectionString);
     }

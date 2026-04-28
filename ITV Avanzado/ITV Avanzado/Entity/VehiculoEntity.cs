@@ -17,12 +17,12 @@ public class VehiculoEntity {
     
     [Required] public int Motor { get; set; }
     
-    [Required] [MaxLength(8)] public string Dni { get; set; } = string.Empty;
+    [Required] [MaxLength(9)] public string Dni { get; set; } = string.Empty;
     
-    [Column(TypeName = "datetime2")]
+    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column(TypeName = "datetime2")]
+    
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsDeleted { get; set; } = false;

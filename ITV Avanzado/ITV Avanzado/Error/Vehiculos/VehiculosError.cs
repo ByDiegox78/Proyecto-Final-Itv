@@ -15,6 +15,9 @@ public record VehiculoError(string Message) : DomainError(Message) {
         : VehiculoError($"Error de base de datos: {Details}");
     public sealed record StorageError(string Details)
         : VehiculoError($"Error de almacenamiento: {Details}");
+
+    public sealed record MaxVehiculosUsageDniError(string Details)
+        : VehiculoError($"Error, cantidad de vehiculos superada: {Details}");
 }
 public static class VehiculoErrors {
     public static DomainError NotFound(string id) {
@@ -35,4 +38,8 @@ public static class VehiculoErrors {
     public static DomainError StorageError(string details) {
         return new VehiculoError.StorageError(details);
     }
+    public static DomainError MaxVehiculosUsageDniError(string details) {
+        return new VehiculoError.MaxVehiculosUsageDniError(details);
+    }
+    
 }
