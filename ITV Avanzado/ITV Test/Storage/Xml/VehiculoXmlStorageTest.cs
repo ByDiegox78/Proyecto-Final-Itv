@@ -118,5 +118,6 @@ public class VehiculoXmlStorageTest {
             res.Error.Should().BeOfType<StorageError.WriteError>();
             res.Error.Message.Should().Contain("Error al escribir");
         }
+        
     }
 }

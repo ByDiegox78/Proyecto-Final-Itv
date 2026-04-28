@@ -83,7 +83,6 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
             return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.InvalidFormat(e.Message));
         }
     }
-    
     private void InitStorage() {
         if (Directory.Exists(AppConfig.DataFolder))
             return;

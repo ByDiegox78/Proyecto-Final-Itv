@@ -37,7 +37,6 @@ public class VehiculoCsvStorage : IVehiculoCsvStorage {
             return Result.Failure<bool, DomainError>(StorageErrors.WriteError(e.Message));
         }
     }
-
     public Result<IEnumerable<Vehiculo>, DomainError> Cargar(string path) {
         if (!Path.Exists(path)) {
             return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.FileNotFound(path));
