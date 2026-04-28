@@ -48,6 +48,8 @@ public class VehiculoCsvStorageTest {
                     Cilindrada = 1200,
                     TipoMotor = Motor.Gasolina,
                     DniPropietario = "01234567L",
+                    FechaMatriculacion = new DateTime(2024, 01, 17),
+                    FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false,
                     CreatedAt = new DateTime(2024, 01, 17),
                     UpdatedAt = new DateTime(2024, 01, 17)
@@ -69,6 +71,8 @@ public class VehiculoCsvStorageTest {
                     Cilindrada = 1200,
                     TipoMotor = Motor.Gasolina,
                     DniPropietario = "01234567L",
+                    FechaMatriculacion = new DateTime(2024, 01, 17),
+                    FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false,
                     CreatedAt = new DateTime(2024, 01, 17),
                     UpdatedAt = new DateTime(2024, 01, 17)
@@ -122,8 +126,8 @@ public class VehiculoCsvStorageTest {
         [Test]
         public void Cargar_CuandoElArchivoTieneFormatoInvalido_DevuelveError() {
             using var writer = new StreamWriter(_path, false, Encoding.UTF8);
-            writer.WriteLine("Id;Matricula;Marca;Cilindrada;TipoMotor;DniPropietario;IsDelete;CreatedAt;UpdatedAt;");
-            writer.WriteLine("1;1234BCD;Seat Ibiza;1200;Gasolina;01234567L;False;2024-01-17 00:00:00;2024-01-17 00:00:00;");
+            writer.WriteLine("Id;Matricula;Marca;Cilindrada;TipoMotor;DniPropietario;FechaMatriculacion;FechaInspeccion;IsDelete;CreatedAt;UpdatedAt;");
+            writer.WriteLine("1;1234BCD;Seat Ibiza;1200;Gasolina;01234567L;2024-01-17 00:00:00;2024-01-17 00:00:00;False;2024-01-17 00:00:00;2024-01-17 00:00:00;");
 
             var res = _storage.Cargar(_path);
 

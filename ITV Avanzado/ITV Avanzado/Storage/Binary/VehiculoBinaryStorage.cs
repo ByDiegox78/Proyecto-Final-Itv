@@ -34,6 +34,8 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
                 writer.Write(d.Cilindrada);
                 writer.Write(d.TipoMotor);
                 writer.Write(d.DniPropietario);
+                writer.Write(d.FechaMatriculacion);
+                writer.Write(d.FechaInspeccion);
                 writer.Write(d.IsDelete);
                 writer.Write(d.CreatedAt);
                 writer.Write(d.UpdatedAt);
@@ -65,6 +67,8 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
                     reader.ReadString(),
                     reader.ReadString(),
                     reader.ReadInt32(),
+                    reader.ReadString(),
+                    reader.ReadString(),
                     reader.ReadString(),
                     reader.ReadString(),
                     reader.ReadBoolean(),

@@ -31,6 +31,8 @@ public static class VehiculoMapperTest {
                 1200,
                 "Gasolina",
                 "01234567L",
+                "2024-01-17T00:00:00",
+                "2024-01-17T00:00:00",
                 false,
                 "2024-01-17T00:00:00",
                 "2024-01-17T00:00:00"
@@ -123,6 +125,8 @@ public static class VehiculoMapperTest {
                 1200,
                 "Hidrogeno",
                 "01234567L",
+                "2024-01-17T00:00:00",
+                "2024-01-17T00:00:00",
                 false,
                 "2024-01-17T00:00:00",
                 "2024-01-17T00:00:00"

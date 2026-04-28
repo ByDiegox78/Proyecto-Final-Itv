@@ -46,6 +46,8 @@ public class VehiculoXmlStorageTest {
                     Cilindrada = 1200,
                     TipoMotor = Motor.Gasolina,
                     DniPropietario = "01234567L",
+                    FechaMatriculacion = new DateTime(2024, 01, 17),
+                    FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false,
                     CreatedAt = new DateTime(2024, 01, 17),
                     UpdatedAt = new DateTime(2024, 01, 17)
@@ -67,6 +69,8 @@ public class VehiculoXmlStorageTest {
                 Cilindrada = 1200,
                 TipoMotor = Motor.Gasolina,
                 DniPropietario = "01234567L",
+                FechaMatriculacion = new DateTime(2024, 01, 17),
+                FechaInspeccion = new DateTime(2024, 01, 17),
                 IsDeleted = false,
                 CreatedAt = new DateTime(2024, 01, 17),
                 UpdatedAt = new DateTime(2024, 01, 17)
