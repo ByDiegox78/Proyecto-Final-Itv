@@ -19,7 +19,10 @@ public class VehiculoEntity {
     
     [Required] [MaxLength(9)] public string Dni { get; set; } = string.Empty;
     
-    
+    [Required] public DateTime FechaMatriculacion { get; set; } = DateTime.UtcNow;
+
+    [Required] public DateTime FechaInspeccion { get; set; } = DateTime.UtcNow;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     
