@@ -86,26 +86,6 @@ public class VehiculoJsonRepositoryTest {
             res.DniPropietario.Should().Be("01234567L");
             res.Matricula.Should().Be("1234BCD");
         }
-
-        [Test]
-        public void GetByMatricula_ConVehiculoExistente_DevuelveVehiculoCorrecto() {
-            var vehiculo = new Vehiculo {
-                Matricula = "1234BCD",
-                Marca = "Seat Ibiza",
-                Cilindrada = 1200,
-                TipoMotor = Motor.Gasolina,
-                DniPropietario = "01234567L",
-                IsDeleted = false,
-                CreatedAt = new DateTime(2024, 01, 17),
-                UpdatedAt = new DateTime(2024, 01, 17)
-            };
-            _repository.Create(vehiculo);
-            var res = _repository.GetByMatricula("1234BCD");
-
-            res.Should().NotBeNull();
-            res!.Matricula.Should().Be("1234BCD");
-        }
-
         [Test]
         public void GetAll_SinParametro_DevuelveTodos() {
             _repository.Create(new Vehiculo {
@@ -240,30 +220,6 @@ public class VehiculoJsonRepositoryTest {
             res.IsSuccess.Should().BeTrue();
             res.Value.Matricula.Should().Be("1234BTD");
         }
-
-        [Test]
-        public void DeleteHard_EliminaVehiculoCorrectamente_DevuelveVehiculoEliminado() {
-            var vehiculo = new Vehiculo {
-                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", IsDeleted = false, 
-                CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
-            };
-            var vehiculo2 = new Vehiculo {
-                Matricula = "1234GPT", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", IsDeleted = false,
-                CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
-            };
-            var v1 = _repository.Create(vehiculo).Value;
-            var v2 = _repository.Create(vehiculo2).Value;
-
-            var res = _repository.HardDelete(v2.Id);
-
-            res.Should().NotBeNull();
-            res!.Id.Should().Be(v2.Id);
-            _repository.GetById(v2.Id).Should().BeNull(); 
-            _repository.GetById(v1.Id).Should().NotBeNull();
-            _repository.GetByMatricula(v2.Matricula).Should().BeNull();
-        }
-        
-
         [Test]
         public void Restore_DevuelveVehiculo_DevuelveCorrectamente() {
             
@@ -280,6 +236,20 @@ public class VehiculoJsonRepositoryTest {
             res.Value.IsDeleted.Should().Be(false);
             res.Value.UpdatedAt.Should().BeAfter(new DateTime(2024, 01, 17));
             res.Value.TipoMotor.Should().Be(vehiculo.TipoMotor);
+        }
+        [Test]
+        public void Delete_ConBoradoFisico_EliminaCorrectamente() {
+            _repository = new VehiculoJsonRepository(_temp,true, false);
+            var vehiculo = new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
+                DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 17),
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            _repository.Create(vehiculo);
+            var res = _repository.Delete(1, false);
+            
+            res.Should().NotBeNull();
+            _repository.GetById(1).Should().BeNull();
         }
     }
     [TestFixture]
@@ -299,7 +269,7 @@ public class VehiculoJsonRepositoryTest {
             private string _temp = null!;
             private VehiculoJsonRepository _repository = null!;
             
-            [Test]
+             [Test]
             public void Create_CrearVehiculoConMatriculaExistente_DebeDevolverError() {
                 var vehiculo = new Vehiculo {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
@@ -319,29 +289,29 @@ public class VehiculoJsonRepositoryTest {
                 res.Error.Should().BeOfType<VehiculoError.MatriculaAlreadyExists>();
                 res.Error.Message.Should()
                     .Contain(
-                        "La matricula La matricula del vehiculo ya se en encuenta en uso ya está registrado en el sistema.");
+                        "1234BCD");
             }
 
             [Test]
             public void Create_CrearVehiculoConDniConMaximoVehiculo_DebeDevolverError() {
                 var vehiculo = new Vehiculo {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina,
-                    DniPropietario = "01234567L",
+                    DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
                 var vehiculo2 = new Vehiculo {
                     Matricula = "2345BCF",
-                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
                 var vehiculo3 = new Vehiculo {
                     Matricula = "3456BCG",
-                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
                 var vehiculo4 = new Vehiculo {
                     Matricula = "4567BCH",
-                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 17),
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
 
@@ -354,14 +324,7 @@ public class VehiculoJsonRepositoryTest {
                 res.Error.Should().BeOfType<VehiculoError.DniAlreadyExists>();
                 res.Error.Message.Should()
                     .Contain(
-                        "El DNI El propietario no puede incluir este vehiculo porque ya tiene 3 a su disposicion ya está registrado en el sistema.");
-            }
-
-            [Test]
-            public void GetById_SinVehiculoExistente_DevuelveError() {
-                var resultado = _repository.GetById(1);
-
-                resultado.Should().BeNull();
+                        "El propietario con dni: 01234567L tiene 3 vehiculos para inspeccion para el mismo dia");
             }
             [Test]
             public void GetByMatricula_VehiculoEliminado_DevuelveNull() {
@@ -377,18 +340,23 @@ public class VehiculoJsonRepositoryTest {
                 _repository.Delete(creado.Id); 
                 var res = _repository.GetByMatricula("1234BCD");
 
-                res.Should().BeNull();
+                res.Should().NotBeNull();
+                res.Should().BeEmpty();
             }
             [Test]
             public void GetByMatricula_NoExisteDevuelveNull() {
                 var res = _repository.GetByMatricula("4196FMR");
 
-                _repository.GetByMatricula("4196FMR").Should().BeNull();
-                res.Should().BeNull();
+                res.Should().NotBeNull();
+                res.Should().BeEmpty();
             }
-            
-            
 
+            [Test]
+            public void GetById_SinVehiculoExistente_DevuelveError() {
+                var resultado = _repository.GetById(1);
+
+                resultado.Should().BeNull();
+            }
             [Test]
             public void Update_VehiculoNoExiste_DevuelveError() {
                 var vehiculo4 = new Vehiculo {
@@ -455,8 +423,8 @@ public class VehiculoJsonRepositoryTest {
                 var res = _repository.Update(4, actu);
                 
                 res.IsFailure.Should().BeTrue();
-                res.Error.Should().BeOfType<VehiculoError.MaxVehiculosUsageDniError>();
-                (res.Error as VehiculoError.MaxVehiculosUsageDniError)?.Details.Should().Be("41234571X");
+                res.Error.Should().BeOfType<VehiculoError.DniAlreadyExists>();
+                (res.Error as VehiculoError.DniAlreadyExists)?.Dni.Should().Be("41234571X");
             }
             
             [Test]
@@ -465,18 +433,38 @@ public class VehiculoJsonRepositoryTest {
                 
                 res.Should().BeNull();
             }
-            [Test]
-            public void HardDelete_CuandoNoExiste_DeberiaRetornarNull() {
-                var res = _repository.HardDelete(1);
-
-                res.Should().BeNull();
-            }
+        
             [Test]
             public void Restore_VehiculoNoExiste_DevuelveError() {
                 var res = _repository.Restore(999);
 
                 res.IsFailure.Should().BeTrue();
                 res.Error.Should().BeOfType<VehiculoError.NotFound>();
+            }
+            [Test]
+            public void Update_VehiculoConInspeccionExistente_DevuelveError() {
+                var vehiculo1 = new Vehiculo {
+                    Matricula = "4567BCH",
+                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",FechaInspeccion = new DateTime(2024, 01, 17),
+                    IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+                };
+                var vehiculo3 = new Vehiculo {
+                    Matricula = "4567BCH",
+                    Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",FechaInspeccion = new DateTime(2024, 01, 18),
+                    IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+                };
+                var vehiculo2 = new Vehiculo {
+                    Matricula = "4567BCH", DniPropietario = "01234567L", FechaInspeccion = new DateTime(2024, 01, 18),
+                };
+                _repository.Create(vehiculo1);
+                _repository.Create(vehiculo3);
+
+                
+                var res = _repository.Update(1, vehiculo2);
+                
+                res.IsFailure.Should().BeTrue();
+                res.Error.Should().BeOfType<VehiculoError.MatriculaAlreadyExists>();
+                (res.Error as VehiculoError.MatriculaAlreadyExists)?.matricula.Should().Be("4567BCH");
             }
         
         }

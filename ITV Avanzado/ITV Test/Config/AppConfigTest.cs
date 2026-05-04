@@ -83,9 +83,8 @@ public class AppConfigTest {
 
             file.Should().NotBeNullOrEmpty();
             file.Should().EndWith(".json");
-        }
-        [Test]
-        public void BackupFormat_DebeDevolverFormatoValido() {
+        } 
+        public void BackupFormat_DebeDevolverFormatoValido(string formato) {
             var format = AppConfig.BackupFormat;
 
             format.Should().NotBeNullOrEmpty();

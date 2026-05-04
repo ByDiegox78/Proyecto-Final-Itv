@@ -70,12 +70,15 @@ public class VehiculoAdoRepository : IVehiculosRepository{
     }
     public Result<Vehiculo, DomainError> Create(Vehiculo vehiculo) {
         _logger.Debug("Creando vehículo con matrícula: {Matricula}", vehiculo.Matricula);
-        if (ExisteMatricula(vehiculo.Matricula))
-            return Result.Failure<Vehiculo, DomainError>(
-                VehiculoErrors.MatriculaAlreadyExists($"La matrícula del vehículo ya se encuentra en uso {vehiculo.Matricula}"));
-        if (!VerificarCochePropietario(vehiculo.DniPropietario))          
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError("El propietario no puede incluir este vehiculo porque ya tiene 3 a su disposicion"));
-
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
+        }
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
+        }
+        
         var vehiculoEntity = vehiculo.ToEntity();
         vehiculoEntity.CreatedAt = DateTime.UtcNow;
         vehiculoEntity.UpdatedAt = DateTime.UtcNow;
@@ -84,9 +87,9 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = @"INSERT INTO Vehiculos (
-            Matricula, Marca, Cilindrada, Motor, Dni, IsDeleted, CreatedAt, UpdatedAt) 
+            Matricula, Marca, Cilindrada, Motor, Dni,FechaMatriculacion,FechaInspeccion, IsDeleted, CreatedAt, UpdatedAt) 
             VALUES (
-            @Matricula, @Marca, @Cilindrada, @Motor, @Dni, @IsDeleted, @CreatedAt, @UpdatedAt);
+            @Matricula, @Marca, @Cilindrada, @Motor, @Dni,@FechaMatriculacion,@FechaInspeccion, @IsDeleted, @CreatedAt, @UpdatedAt);
             SELECT last_insert_rowid();";
         AddParameters(command, vehiculoEntity);
         vehiculoEntity.Id = Convert.ToInt32(command.ExecuteScalar());
@@ -103,18 +106,13 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         if (exists == null)            
             return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.NotFound(id.ToString()));
         
-        if (vehiculo.Matricula != exists.Matricula) {
-            var other = GetByMatricula(vehiculo.Matricula);
-            if (other != null && other.Id != id) {
-                _logger.Warning("No se puede actualizar vehículo con id {Id} porque la matrícula {Matricula} ya está en uso", id, vehiculo.Matricula);
-                return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
-            }
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion, id)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
         }
-        if (vehiculo.DniPropietario != exists.DniPropietario) {
-            if (!VerificarCochePropietario(vehiculo.DniPropietario)) {
-                _logger.Warning("El propietario con DNI {Dni} no es válido o ya tiene 3 vehículos", vehiculo.DniPropietario);
-                return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
-            }
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion,id)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
         }
         var vEntity = vehiculo.ToEntity();
         vEntity.Id = id;
@@ -127,24 +125,30 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         using var command = connection.CreateCommand();
         command.CommandText = @"
             UPDATE Vehiculos 
-            SET Matricula = @Matricula, Marca = @Marca, Cilindrada = @Cilindrada, Motor = @Motor, Dni = @Dni, IsDeleted = @IsDeleted, CreatedAt = @CreatedAt, UpdatedAt = @UpdatedAt
+            SET Matricula = @Matricula, Marca = @Marca, Cilindrada = @Cilindrada, Motor = @Motor, Dni = @Dni,FechaMatriculacion = @FechaMatriculacion, 
+                FechaInspeccion = @FechaInspeccion, IsDeleted = @IsDeleted, CreatedAt = @CreatedAt, UpdatedAt = @UpdatedAt
             WHERE Id = @Id;";
         AddParameters(command, vEntity, vEntity.Id);
         command.ExecuteNonQuery();
         return Result.Success<Vehiculo, DomainError>(vEntity.ToModel());
     }
-    public Vehiculo? Delete(int id) {
+    public Vehiculo? Delete(int id, bool isLogic = true) {
         var exists = GetById(id);
         if (exists == null) return null;
         using var connection = CreateConnection();
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "UPDATE Vehiculos SET IsDeleted = 1, UpdatedAt = @UpdatedAt WHERE Id = @Id";
+        if (isLogic) {
+            command.CommandText = "UPDATE Vehiculos SET IsDeleted = 1, UpdatedAt = @UpdatedAt WHERE Id = @Id";
+            command.Parameters.Add(new SqliteParameter("@Id", id));
+            command.Parameters.Add(new SqliteParameter("@UpdatedAt", DateTime.UtcNow.ToString("o")));
+            command.ExecuteNonQuery();
+            return exists;
+        }    
+        command.CommandText = "DELETE FROM Vehiculos WHERE Id = @Id";
         command.Parameters.Add(new SqliteParameter("@Id", id));
-        command.Parameters.Add(new SqliteParameter("@UpdatedAt", DateTime.UtcNow.ToString("o")));
         command.ExecuteNonQuery();
-
-        return GetById(id);    
+        return exists;
     }
     public bool DeleteAll() {
         using var connection = CreateConnection();
@@ -153,17 +157,6 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         command.CommandText = "DELETE FROM Vehiculos;";
         command.ExecuteNonQuery();
         return true;
-    }
-    public Vehiculo? HardDelete(int id) {
-        var exists = GetById(id);
-        if (exists == null) return null;
-        using var connection = CreateConnection();
-        connection.Open();
-        using var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM Vehiculos WHERE Id = @Id";
-        command.Parameters.Add(new SqliteParameter("@Id", id));
-        command.ExecuteNonQuery();
-        return exists;
     }
     public Result<Vehiculo, DomainError> Restore(int id) {
         var exists = GetById(id);
@@ -180,15 +173,18 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         var updated = GetById(id);
         return Result.Success<Vehiculo, DomainError>(updated);
     }
-    public Vehiculo? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
         using var connection = CreateConnection();
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula";
+        command.CommandText = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0";
         command.Parameters.Add(new SqliteParameter("@Matricula", matricula));
-        
+        var list = new List<Vehiculo>();
         using var reader = command.ExecuteReader();
-        return reader.Read() ? ReadEntity(reader).ToModel() : null;
+        while (reader.Read()) {
+            list.Add(ReadEntity(reader).ToModel());
+        }
+        return list;    
     }
     private void EnsureTable() {
         using var connection = CreateConnection();
@@ -198,11 +194,13 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         DROP TABLE IF EXISTS Vehiculos;
         CREATE TABLE Vehiculos(
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Matricula TEXT NOT NULL UNIQUE,
+            Matricula TEXT NOT NULL,
             Marca TEXT NOT NULL,
             Cilindrada INTEGER NOT NULL,
             Motor INTEGER NOT NULL,
             Dni TEXT NOT NULL,
+            FechaMatriculacion Text NOT NULL,
+            FechaInspeccion Text NOT NULL,  
             CreatedAt TEXT NOT NULL,
             UpdatedAt TEXT NOT NULL,
             IsDeleted INTEGER NOT NULL
@@ -227,15 +225,6 @@ public class VehiculoAdoRepository : IVehiculosRepository{
             UpdatedAt = DateTime.Parse(reader.GetString(reader.GetOrdinal("updatedat")))
         };
     }
-    private bool VerificarCochePropietario(string dni) {
-        using var connection = CreateConnection();
-        connection.Open();
-        using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM Vehiculos WHERE Dni = @dni AND IsDeleted = 0";
-        command.Parameters.AddWithValue("@dni", dni);
-        int cantidadCoches = Convert.ToInt32(command.ExecuteScalar());
-        return cantidadCoches < 3;
-    }
     private void AddParameters(IDbCommand command, VehiculoEntity entity, int? id = null) { 
         if (id.HasValue) {
             command.Parameters.Add(new SqliteParameter("@Id", id.Value));
@@ -245,16 +234,42 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         command.Parameters.Add(new SqliteParameter("@Cilindrada", entity.Cilindrada));
         command.Parameters.Add(new SqliteParameter("@Motor", entity.Motor));
         command.Parameters.Add(new SqliteParameter("@Dni", entity.Dni));
+        command.Parameters.Add(new SqliteParameter("@FechaMatriculacion", entity.FechaMatriculacion.ToString("s")));
+        command.Parameters.Add(new SqliteParameter("@FechaInspeccion", entity.FechaInspeccion.ToString("s")));
         command.Parameters.Add(new SqliteParameter("@IsDeleted", entity.IsDeleted ? 1 : 0));
         command.Parameters.Add(new SqliteParameter("@CreatedAt", entity.CreatedAt.ToString("s")));
         command.Parameters.Add(new SqliteParameter("@UpdatedAt", entity.UpdatedAt.ToString("s")));
     }
-    private bool ExisteMatricula(string matricula) {
+    //Unicidad de Cita: Un mismo vehículo (matrícula) no puede tener programada más de una inspección el mismo día.
+    //Cupo por Propietario: Un mismo DNI no puede tener más de tres vehículos registrados para inspección en la misma fecha.
+    private bool CupoVehiculosPorDia(string dni, DateTime fecha, int idActual = -1) {
         using var connection = CreateConnection();
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = @"SELECT COUNT(1) FROM Vehiculos WHERE Matricula = @Matricula";
+        command.CommandText= @"SELECT COUNT(*) 
+        FROM Vehiculos 
+        WHERE Dni = @Dni 
+        AND DATE(FechaInspeccion) = DATE(@Fecha)
+        AND Id != @IdActual
+        AND IsDeleted = 0";
+        command.Parameters.Add(new SqliteParameter("Dni", dni));
+        command.Parameters.Add(new SqliteParameter("@Fecha", fecha));
+        command.Parameters.Add(new SqliteParameter("@IdActual", idActual));
+        return Convert.ToInt32(command.ExecuteScalar()) < 3; 
+    } 
+    private bool ExisteCitaDuplicada(string matricula, DateTime fecha, int idActual = -1) {
+        using var connection = CreateConnection();
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText= @"SELECT COUNT(*) 
+        FROM Vehiculos 
+        WHERE Matricula = @Matricula 
+        AND DATE(FechaInspeccion) = DATE(@Fecha)
+        AND Id != @IdActual
+        AND IsDeleted = 0";
         command.Parameters.Add(new SqliteParameter("Matricula", matricula));
-        return Convert.ToInt32(command.ExecuteScalar()) > 0;
+        command.Parameters.Add(new SqliteParameter("@Fecha", fecha));
+        command.Parameters.Add(new SqliteParameter("@IdActual", idActual));
+        return Convert.ToInt32(command.ExecuteScalar()) > 0; 
     }
 }

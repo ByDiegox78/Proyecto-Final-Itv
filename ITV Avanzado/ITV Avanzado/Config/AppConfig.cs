@@ -73,4 +73,7 @@ public class AppConfig {
         }
     }
     public static string BackupDirectory => Path.Combine(AppContext.BaseDirectory, Config.GetValue<string>("Backup:Directory") ?? "back");
+
+    public static bool IsLogic => Config.GetValue<bool>("IsLogic:Enabled", true);
+    
 }

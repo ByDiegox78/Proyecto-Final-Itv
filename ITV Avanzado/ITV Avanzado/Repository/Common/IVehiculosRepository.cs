@@ -27,25 +27,19 @@ public interface IVehiculosRepository {
     /// <summary>
     ///     Elimina un vehiculo.
     /// </summary>
-    Vehiculo? Delete(int id);
+    Vehiculo? Delete(int id, bool isLogic);
     /// <summary>
     ///     Busca el vehiculo por su matricula
     /// </summary>
     /// <param name="matricula">Parametro de busqueda</param>
     /// <returns></returns>
-    Vehiculo? GetByMatricula(string matricula);
+    IEnumerable<Vehiculo>? GetByMatricula(string matricula);
     /// <summary>
     ///     Elimina todos los vehiculos
     /// </summary>
     /// <returns></returns>
     bool DeleteAll();
-    /// <summary>
-    /// Elimina el vehilo con borrado fisico
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    Vehiculo? HardDelete(int id);
-
+    
     Result<Vehiculo, DomainError> Restore(int id);
 
 

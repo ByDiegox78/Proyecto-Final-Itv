@@ -58,11 +58,13 @@ public class VehiculoDapperRepository : IVehiculosRepository {
     }
 
     public Result<Vehiculo, DomainError> Create(Vehiculo vehiculo) {
-        if (ExisteMatricula(vehiculo.Matricula)) {
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists("La matricula del vehiculo ya se en encuenta en uso"));
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
         }
-        if (!VerificarCochePropietario(vehiculo.DniPropietario)) {
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError("El propietario no puede incluir este vehiculo porque ya tiene 3 a su disposicion"));
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
         }
 
         vehiculo = vehiculo with {
@@ -74,8 +76,9 @@ public class VehiculoDapperRepository : IVehiculosRepository {
         var entity = vehiculo.ToEntity();
         try {
             var sql = @"
-            INSERT INTO Vehiculos (Matricula, Marca, Cilindrada, Motor, Dni, IsDeleted, CreatedAt, UpdatedAt)
-            VALUES (@Matricula, @Marca, @Cilindrada, @Motor, @Dni, @IsDeleted, @CreatedAt, @UpdatedAt);
+            INSERT INTO Vehiculos (Matricula, Marca, Cilindrada, Motor, Dni, FechaMatriculacion, FechaInspeccion, IsDeleted, CreatedAt, UpdatedAt)
+            VALUES 
+            (@Matricula, @Marca, @Cilindrada, @Motor, @Dni, @FechaMatriculacion, @FechaInspeccion, @IsDeleted, @CreatedAt, @UpdatedAt);
             SELECT last_insert_rowid()";
             entity.Id = _connection.ExecuteScalar<int>(sql, entity);
             return Result.Success<Vehiculo, DomainError>(GetById(entity.Id)!);
@@ -92,14 +95,13 @@ public class VehiculoDapperRepository : IVehiculosRepository {
             _logger.Warning("No se puede actualizar: vehiculo con id {Id} no encontrada", id);
             return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.NotFound(id.ToString()));
         }
-        if (ExisteMatricula(vehiculo.Matricula)) {
-            _logger.Warning("No se puede actualizar el vehículo con id {Id} porque la matrícula {Matricula} ya está en uso por otro vehículo",
-                id, vehiculo.Matricula); 
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion, id)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
         }
-        if (!VerificarCochePropietario(vehiculo.DniPropietario))          {
-            _logger.Warning("El propietario con DNI {Dni} ya tiene 3 vehículos", vehiculo.DniPropietario);
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion,id)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
         }
         
         vehiculo = vehiculo with {
@@ -123,27 +125,31 @@ public class VehiculoDapperRepository : IVehiculosRepository {
         }
     }
 
-    public Vehiculo? Delete(int id) {
+    public Vehiculo? Delete(int id, bool isLogic = true) {
         try {
             var existing = GetById(id);
             if (existing == null)
                 return null;
-            var sql =
-                "UPDATE Vehiculos SET IsDeleted = 1, UpdatedAt = @UpdatedAt WHERE Id = @Id";            
-            _connection.Execute(sql, new { Id = id, DeletedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
-            return GetById(id);
-            
+            if (isLogic) {
+                var sql = "UPDATE Vehiculos SET IsDeleted = 1, UpdatedAt = @UpdatedAt WHERE Id = @Id";            
+                _connection.Execute(sql, new { Id = id, UpdatedAt = DateTime.UtcNow });
+                return GetById(id);
+            }
+            var sqlHard = "DELETE FROM Vehiculos WHERE Id = @Id";
+            _connection.Execute(sqlHard, new { Id = id });
+            return existing;
         }
         catch (Exception e) {
             _logger.Error(e, "Error al eliminar vehiculo");
             return null;
         }
     }
-    public Vehiculo? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
         try {
-            var sql = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula";
-            var entity = _connection.QueryFirstOrDefault<VehiculoEntity>(sql, new { Matricula = matricula });
+            var sql = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0";
+            var entity = _connection.Query<VehiculoEntity>(sql, new { Matricula = matricula });
             return entity.ToModel();
+            
         }
         catch (Exception ex) {
             _logger.Error(ex, "Error al obtener vehiculo por Matricula {Matricula}", matricula);
@@ -158,15 +164,6 @@ public class VehiculoDapperRepository : IVehiculosRepository {
             _logger.Error(ex, "Error al eliminar todos los vehiculos");
             return false;
         }
-    }
-
-    public Vehiculo? HardDelete(int id) {
-        var existing = GetById(id);
-        if (existing == null)
-            return null;
-        var sql = "DELETE FROM Vehiculos WHERE Id = @Id";
-        _connection.Execute(sql, new { Id = id });
-        return existing;
     }
 
     public Result<Vehiculo, DomainError> Restore(int id) {
@@ -201,6 +198,8 @@ public class VehiculoDapperRepository : IVehiculosRepository {
                 Cilindrada INTEGER NOT NULL,
                 Motor INTEGER NOT NULL,
                 Dni TEXT NOT NULL,
+                FechaMatriculacion TEXT NOT NULL,
+                FechaInspeccion TEXT NOT NULL,
                 CreatedAt TEXT NOT NULL,
                 UpdatedAt TEXT NOT NULL,
                 IsDeleted INTEGER NOT NULL
@@ -213,26 +212,17 @@ public class VehiculoDapperRepository : IVehiculosRepository {
         return _connection.ExecuteScalar<int>("SELECT COUNT(1) FROM Vehiculos");
     }
 
-    private bool VerificarCochePropietario(string dni) {
-        try {
-            var sql = "SELECT COUNT(*) FROM Vehiculos WHERE Dni = @dni AND IsDeleted = 0";
-            int cantidad = _connection.ExecuteScalar<int>(sql, new { dni });
-            return cantidad < 3;
-        }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
+    private bool CupoVehiculosPorDia(string dni, DateTime fecha, int idActual = -1) {
+       
+        var sql = @"SELECT COUNT(*) FROM Vehiculos WHERE Dni = @Dni AND DATE(FechaInspeccion) = DATE(@Fecha)AND Id != @IdActual AND IsDeleted = 0";
 
-    private bool ExisteMatricula(string matricula) {
-        try {
-            var sql = "SELECT COUNT(1) FROM Vehiculos WHERE Matricula = @Matricula";
-            return _connection.ExecuteScalar<int>(sql, new { Matricula = matricula }) > 0;
-        }
-        catch (Exception ex) {
-            _logger.Error(ex, "Error al verificar Email {Matricula}", matricula);
-            return false;
-        }
+        var count = _connection.ExecuteScalar<int>(sql, new { Dni = dni, Fecha = fecha, IdActual = idActual });
+        return count < 3;
+    } 
+    private bool ExisteCitaDuplicada(string matricula, DateTime fecha, int idActual = -1) {
+        var sql = @"SELECT COUNT(*) FROM Vehiculos WHERE Matricula = @Matricula AND DATE(FechaInspeccion) = DATE(@Fecha)AND Id != @IdActual AND IsDeleted = 0";
+
+        var count = _connection.ExecuteScalar<int>(sql, new { Matricula = matricula, Fecha = fecha, IdActual = idActual });
+        return count > 0;
     }
 }

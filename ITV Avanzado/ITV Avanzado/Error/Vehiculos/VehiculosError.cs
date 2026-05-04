@@ -8,9 +8,9 @@ public record VehiculoError(string Message) : DomainError(Message) {
     public sealed record Validation(IEnumerable<string> Errors)
         : VehiculoError($"Se han detectado errores de validación en la entidad:{Environment.NewLine}• {string.Join($"{Environment.NewLine}• ", Errors)}");
     public sealed record DniAlreadyExists(string Dni)
-        : VehiculoError($"Conflicto de integridad: El DNI {Dni} ya está registrado en el sistema.");
+        : VehiculoError($"El propietario con dni: {Dni} tiene 3 vehiculos para inspeccion para el mismo dia");
     public sealed record MatriculaAlreadyExists(string matricula)
-        : VehiculoError($"Conflicto de integridad: La matricula {matricula} ya está registrado en el sistema.");
+        : VehiculoError($"Conflicto de integridad: La matricula {matricula} tiene una inspeccion resgistrada para hoy");
     public sealed record DatabaseError(string Details)
         : VehiculoError($"Error de base de datos: {Details}");
     public sealed record StorageError(string Details)
