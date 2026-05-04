@@ -279,7 +279,7 @@ public class VehiculoEfCoreRepositoryTest {
                 var res = _repository.Create(vehiculo2);
 
                 res.IsFailure.Should().BeTrue();
-                res.Error.Should().BeOfType<VehiculoError.MatriculaAlreadyExists>();
+                res.Error.Should().BeOfType<VehiculoError.MatriculaInspeccionDuplicada>();
                 res.Error.Message.Should()
                     .Contain(
                         "1234BCD");
@@ -315,7 +315,7 @@ public class VehiculoEfCoreRepositoryTest {
                 var res = _repository.Create(vehiculo4);
 
                 res.IsFailure.Should().BeTrue();
-                res.Error.Should().BeOfType<VehiculoError.DniAlreadyExists>();
+                res.Error.Should().BeOfType<VehiculoError.MaxVehiculosUsageDniError>();
                 res.Error.Message.Should()
                     .Contain(
                         "El propietario con dni: 01234567L tiene 3 vehiculos para inspeccion para el mismo dia");
@@ -350,8 +350,8 @@ public class VehiculoEfCoreRepositoryTest {
                 var res = _repository.Update(2, vehiculo);
 
                 res.IsFailure.Should().BeTrue();
-                res.Error.Should().BeOfType<VehiculoError.MatriculaAlreadyExists>();
-                (res.Error as VehiculoError.MatriculaAlreadyExists)?.matricula.Should().Be("1234BCD");
+                res.Error.Should().BeOfType<VehiculoError.MatriculaInspeccionDuplicada>();
+                (res.Error as VehiculoError.MatriculaInspeccionDuplicada)?.matricula.Should().Be("1234BCD");
 
             }
             [Test]
@@ -385,8 +385,8 @@ public class VehiculoEfCoreRepositoryTest {
                 var res = _repository.Update(4, actu);
                 
                 res.IsFailure.Should().BeTrue();
-                res.Error.Should().BeOfType<VehiculoError.DniAlreadyExists>();
-                (res.Error as VehiculoError.DniAlreadyExists)?.Dni.Should().Be("41234571X");
+                res.Error.Should().BeOfType<VehiculoError.MaxVehiculosUsageDniError>();
+                (res.Error as VehiculoError.MaxVehiculosUsageDniError)?.Dni.Should().Be("41234571X");
             }
             [Test]
             public void Delete_CuandoNoExiste_DeberiaRetornarNull() {

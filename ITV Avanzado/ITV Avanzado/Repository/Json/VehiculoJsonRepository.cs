@@ -55,11 +55,11 @@ public class VehiculoJsonRepository : IVehiculosRepository{
         _logger.Debug("Creando un vehiculo {Entity}", vehiculo);
         if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion)) {
             _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
         }
         if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion)) {
             _logger.Warning("La matricula {Matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaInspeccionDuplicada(vehiculo.Matricula));
         }
         var nuevo = vehiculo with {
             Id = ++_idCounter,
@@ -81,11 +81,11 @@ public class VehiculoJsonRepository : IVehiculosRepository{
         }
         if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion, id)) {
             _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.DniAlreadyExists(vehiculo.DniPropietario));
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
         }
         if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion,id)) {
             _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaInspeccionDuplicada(vehiculo.Matricula));
         }
         var actualizado = vehiculo with {
             Id = id,
