@@ -18,6 +18,8 @@
                 vehiculo.Cilindrada,
                 vehiculo.TipoMotor.ToString(),
                 vehiculo.DniPropietario,
+                vehiculo.FechaMatriculacion.ToString(IsoFormat, InvariantCulture),
+                vehiculo.FechaInspeccion.ToString(IsoFormat, InvariantCulture),
                 vehiculo.IsDeleted,
                 vehiculo.CreatedAt.ToString(IsoFormat, InvariantCulture),
                 vehiculo.UpdatedAt.ToString(IsoFormat, InvariantCulture)
@@ -25,8 +27,7 @@
         }
 
         public static Vehiculo ToModel(this VehiculoDto dto) {
-            var createdAt = DateTime.Parse(dto.CreatedAt, InvariantCulture);
-            var updatedAt = DateTime.Parse(dto.UpdatedAt, InvariantCulture);
+            var dateTime = DateTime.Parse(dto.CreatedAt, InvariantCulture);
             
             return new Vehiculo{
                 Id = dto.Id,
@@ -35,9 +36,11 @@
                 Cilindrada = dto.Cilindrada,
                 TipoMotor = Enum.TryParse(dto.TipoMotor, out Motor tipo) ? tipo : Motor.Diesel,
                 DniPropietario = dto.DniPropietario,
+                FechaMatriculacion = dateTime,
+                FechaInspeccion = dateTime,
                 IsDeleted = dto.IsDelete,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
+                CreatedAt = dateTime,
+                UpdatedAt = dateTime
             };
         }
 
@@ -50,6 +53,8 @@
                 Cilindrada = entity.Cilindrada,
                 TipoMotor = (Motor)entity.Motor,
                 DniPropietario = entity.Dni,
+                FechaMatriculacion = entity.FechaMatriculacion,
+                FechaInspeccion = entity.FechaInspeccion,
                 IsDeleted = entity.IsDeleted,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
@@ -64,6 +69,8 @@
                 Cilindrada = vehiculo.Cilindrada,
                 Motor = (int)vehiculo.TipoMotor,
                 Dni = vehiculo.DniPropietario,
+                FechaMatriculacion = vehiculo.FechaMatriculacion,
+                FechaInspeccion = vehiculo.FechaInspeccion,
                 IsDeleted = vehiculo.IsDeleted,
                 CreatedAt = vehiculo.CreatedAt,
                 UpdatedAt = vehiculo.UpdatedAt

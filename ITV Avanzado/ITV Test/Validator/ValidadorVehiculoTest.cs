@@ -18,7 +18,8 @@ public class ValidadorVehiculoTest {
         public void Validar_VehiculoValido_Succes() {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 900, TipoMotor = Motor.Diesel,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
 
@@ -30,7 +31,8 @@ public class ValidadorVehiculoTest {
         public void Validate_MotoresCombustionValidos_Succes(Motor motor) {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 900, TipoMotor = motor,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
 
@@ -41,7 +43,8 @@ public class ValidadorVehiculoTest {
         public void Validate_MotoreElectricoValido_Succes(Motor motor) {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 0, TipoMotor = motor,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-10),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
 
@@ -65,7 +68,8 @@ public class ValidadorVehiculoTest {
         public void Validar_MatriculaInvalida_Invalid(string matricula) {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = matricula, Marca = "Fiat", Cilindrada = 900, TipoMotor = Motor.Diesel,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
 
             var res = _validador.Validar(vehiculo);
@@ -81,7 +85,8 @@ public class ValidadorVehiculoTest {
         public void Validar_MarcaInvalida_NoSucces(string marca) {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = marca, Cilindrada = 900, TipoMotor = Motor.Diesel,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
             
@@ -96,7 +101,8 @@ public class ValidadorVehiculoTest {
         public void Validar_CilindradaElectricoInvalida_NoSucces(int cilindrada) {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 900, TipoMotor = Motor.Electrico,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
             
@@ -112,7 +118,8 @@ public class ValidadorVehiculoTest {
             
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = cilindrada, TipoMotor = Motor.Diesel,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
             
@@ -126,7 +133,8 @@ public class ValidadorVehiculoTest {
         public void Validar_MotorInvalido_NoSucces() {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 900, TipoMotor = (Motor)1000,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow.AddDays(-100),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
             };
             var res = _validador.Validar(vehiculo);
             
@@ -151,6 +159,41 @@ public class ValidadorVehiculoTest {
             (res.Error as VehiculoError.Validation)?.Errors.Should()
                 .Contain("El dni del dueño no tiene el formato correcto");
         }
+        [Test]
+        public void Create_FechaMatriculacionFutura_Error() {
+            var vehiculo = new Vehiculo {
+                Matricula = "1234ABC",
+                Marca = "Seat",
+                Cilindrada = 1200,
+                TipoMotor = Motor.Gasolina,
+                DniPropietario = "12345678A",
+                FechaMatriculacion = DateTime.UtcNow.AddDays(1),
+                FechaInspeccion = DateTime.UtcNow.AddDays(10)
+            };
+
+            var res = _validador.Validar(vehiculo);
+
+            res.IsSuccess.Should().BeFalse();
+        }
+        [TestCase(31)]
+        [TestCase(-1)]
+        public void Create_FechaInspeccionMayor30DiasOAnteriorActual_Error(int dias)
+        {
+            var vehiculo = new Vehiculo {
+                Matricula = "1234JKL",
+                Marca = "Seat",
+                Cilindrada = 1200,
+                TipoMotor = Motor.Gasolina,
+                DniPropietario = "12345678A",
+                FechaMatriculacion = DateTime.UtcNow.AddDays(-10),
+                FechaInspeccion = DateTime.UtcNow.AddDays(dias)
+            };
+
+            var res = _validador.Validar(vehiculo);
+
+            res.IsSuccess.Should().BeFalse();
+        }
+        
     }
     
 }

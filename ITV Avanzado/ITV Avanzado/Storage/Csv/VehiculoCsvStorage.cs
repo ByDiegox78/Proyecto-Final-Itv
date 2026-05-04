@@ -23,12 +23,12 @@ public class VehiculoCsvStorage : IVehiculoCsvStorage {
         try {
             _logger.Debug("Guardando los items en el archivo {Path}", path);
             using var write = new StreamWriter(path, false, Encoding.UTF8);
-            write.WriteLine("Id;Matricula;Marca;Cilindrada;TipoMotor;DniPropietario;IsDelete;CreatedAt;UpdatedAt;");
+            write.WriteLine("Id;Matricula;Marca;Cilindrada;TipoMotor;DniPropietario;FechaMatriculacion;FechaInspeccion;IsDelete;CreatedAt;UpdatedAt;");
             items.Select(p => p.ToDto())
                 .ToList()
                 .ForEach(p => {
                     write.WriteLine(
-                        $"{p.Id};{p.Matricula};{p.Marca};{p.Cilindrada};{p.TipoMotor};{p.DniPropietario};{p.IsDelete};{p.CreatedAt};{p.UpdatedAt};");
+                        $"{p.Id};{p.Matricula};{p.Marca};{p.Cilindrada};{p.TipoMotor};{p.FechaMatriculacion};{p.FechaInspeccion};{p.DniPropietario};{p.IsDelete};{p.CreatedAt};{p.UpdatedAt};");
                 });
             return Result.Success<bool, DomainError>(true);
         }
@@ -37,7 +37,6 @@ public class VehiculoCsvStorage : IVehiculoCsvStorage {
             return Result.Failure<bool, DomainError>(StorageErrors.WriteError(e.Message));
         }
     }
-
     public Result<IEnumerable<Vehiculo>, DomainError> Cargar(string path) {
         if (!Path.Exists(path)) {
             return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.FileNotFound(path));
@@ -53,9 +52,11 @@ public class VehiculoCsvStorage : IVehiculoCsvStorage {
                     int.Parse(campos[3]),
                     campos[4],
                     campos[5],
-                    bool.Parse(campos[6]),
+                    campos[6],
                     campos[7],
-                    campos[7]
+                    bool.Parse(campos[8]),
+                    campos[9],
+                    campos[10]
                 ).ToModel()).ToList();
             return Result.Success<IEnumerable<Vehiculo>, DomainError>(vehiculos);
         }

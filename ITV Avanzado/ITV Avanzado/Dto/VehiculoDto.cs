@@ -10,8 +10,9 @@ public record VehiculoDto(
     [property: XmlElement("Marca")] string Marca,
     [property: XmlElement("Cilindrada")] int Cilindrada,
     [property: XmlElement("TipoMotor")] string TipoMotor,
-    [property: XmlElement("DniPropietario")]
-    string DniPropietario,
+    [property: XmlElement("DniPropietario")] string DniPropietario,
+    [property: XmlElement("FechaMatriculacion")] string FechaMatriculacion,
+    [property: XmlElement("FechaInspeccion")] string FechaInspeccion,
     [property: XmlElement("IsDelete")] bool IsDelete,
     [property: XmlElement("CreatedAt")] string CreatedAt,
     [property: XmlElement("UpdatedAt")] string UpdatedAt
@@ -22,7 +23,9 @@ public record VehiculoDto(
         "",
         0,          
         "",        
-        "",         
+        "", 
+        "",
+        "",
         false,      
         "",         
         ""          

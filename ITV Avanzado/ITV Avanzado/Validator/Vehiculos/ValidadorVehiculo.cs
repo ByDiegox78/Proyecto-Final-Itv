@@ -25,7 +25,7 @@
                 if (entidad.Cilindrada != 0)
                     errores.Add("La cilindrada debe ser 0 en vehículos eléctricos");
             } else {
-                if (!estaEnRangoValido)
+                if (entidad.Cilindrada < 800 || entidad.Cilindrada > 3000)
                     errores.Add("La cilindrada debe estar entre 800 y 3000 (excepto vehículos eléctricos)");
             }
 
@@ -35,6 +35,14 @@
 
             if (!ValidarDni(entidad.DniPropietario)) {
                 errores.Add("El dni del dueño no tiene el formato correcto");
+            }
+
+            if (entidad.FechaMatriculacion > DateTime.UtcNow.Date) {
+                errores.Add("La fecha de matriculación no puede ser futura a la fecha actual");
+            }
+
+            if (entidad.FechaInspeccion < DateTime.UtcNow.Date || entidad.FechaInspeccion.Date > DateTime.UtcNow.AddDays(30)) {
+                errores.Add("La fecha de inspección debe estar entre hoy y los próximos 30 días");
             }
 
             if (errores.Any())

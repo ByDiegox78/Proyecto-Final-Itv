@@ -58,12 +58,13 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
     }
 
     public Result<Vehiculo, DomainError> Create(Vehiculo vehiculo) {
-        if (_context.Vehiculos.Any(p => p.Matricula == vehiculo.Matricula)) {
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists("La matricula del vehiculo ya se en encuenta en uso"));
-
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
         }
-        if (!VerificarCochePropietario(vehiculo.DniPropietario)) {
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError("El propietario no puede incluir este vehiculo porque ya tiene 3 a su disposicion"));
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaInspeccionDuplicada(vehiculo.Matricula));
         }
         vehiculo = vehiculo with {
             Id = 0,
@@ -94,14 +95,13 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             _logger.Warning("No se puede actualizar: vehiculo con id {Id} no encontrada", id);
             return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.NotFound(id.ToString()));
         }
-        if (ExisteMatricula(vehiculo.Matricula)) {
-            _logger.Warning("No se puede actualizar el vehículo con id {Id} porque la matrícula {Matricula} ya está en uso por otro vehículo",
-                id, vehiculo.Matricula); 
-            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaAlreadyExists(vehiculo.Matricula));
-        }
-        if (!VerificarCochePropietario(vehiculo.DniPropietario))          {
-            _logger.Warning("El propietario con DNI {Dni} ya tiene 3 vehículos", vehiculo.DniPropietario);
+        if (!CupoVehiculosPorDia(vehiculo.DniPropietario, vehiculo.FechaInspeccion, id)) {
+            _logger.Warning("El propietario con dni: {dni} tiene 3 vehiculos para inspeccion para el mismo dia", vehiculo.DniPropietario);
             return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MaxVehiculosUsageDniError(vehiculo.DniPropietario));
+        }
+        if (ExisteCitaDuplicada(vehiculo.Matricula,vehiculo.FechaInspeccion,id)) {
+            _logger.Warning("La matricula {matriula} tiene una inspeccion resgistrada para hoy", vehiculo.Matricula);
+            return Result.Failure<Vehiculo, DomainError>(VehiculoErrors.MatriculaInspeccionDuplicada(vehiculo.Matricula));
         }
         entity.Matricula = vehiculo.Matricula;
         entity.Marca = vehiculo.Marca;
@@ -120,26 +120,34 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
         
     }
 
-    public Vehiculo? Delete(int id) {
+    public Vehiculo? Delete(int id, bool isLogic = true) {
         try {
             var entity = _context.Vehiculos.FirstOrDefault(p => p.Id == id);
             if (entity == null)
                 return null;
-            entity.IsDeleted = true;
-            entity.UpdatedAt = DateTime.UtcNow;
+            if (isLogic) {
+                entity.IsDeleted = true;
+                entity.UpdatedAt = DateTime.UtcNow;
+                _context.SaveChanges();
+                return GetById(id);
+            }
+            _context.Vehiculos.Remove(entity);
             _context.SaveChanges();
-            return GetById(id);
+            return entity.ToModel();
         }
         catch (Exception e) {
             _logger.Error(e, "Error al eliminar Vehiculo");
             return null;
         }
     }
-
-    public Vehiculo? GetByMatricula(string matricula) {
-        return _context.Vehiculos.FirstOrDefault(v => v.Matricula == matricula).ToModel();
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+        var sql = _context.Vehiculos.Where(c => c.Matricula == matricula && !c.IsDeleted);
+        var list = new List<Vehiculo>();
+        foreach (var s in sql) {
+            list.Add(s.ToModel());   
+        }
+        return list;
     }
-
     public bool DeleteAll() {
         try {
             _context.Vehiculos.RemoveRange(_context.Vehiculos);
@@ -151,21 +159,6 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             return false;
         }
     }
-
-    public Vehiculo? HardDelete(int id) {
-        try {
-            var entity = _context.Vehiculos.FirstOrDefault(p => p.Id == id);
-            if (entity == null)
-                return null;
-            _context.Vehiculos.Remove(entity);
-            _context.SaveChanges();
-            return entity.ToModel();
-        } catch (Exception e) {
-            _logger.Error(e, "Error al eliminar Vehiculo");
-            return null;
-        }
-    }
-
     public Result<Vehiculo, DomainError> Restore(int id) {
         try {
             var entity = _context.Vehiculos.FirstOrDefault(P => P.Id == id);
@@ -184,18 +177,21 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             throw;
         }
     }
-    private bool VerificarCochePropietario(string dni) {
-        try {
-            return _context.Vehiculos.Count(v => v.Dni == dni & !v.IsDeleted) < 3;
-        }
-        catch (Exception e) {
-            _logger.Error(e, "Error al verificar vehículos del propietario");
-            return false;
-        }
+    private bool CupoVehiculosPorDia(string dni, DateTime fecha, int idActual = -1) {
+        var count = _context.Vehiculos.Count(v =>
+            v.Dni == dni &&
+            v.FechaInspeccion.Date == fecha.Date &&
+            v.Id != idActual &&
+            !v.IsDeleted
+        );
+        return count < 3;
     }
-
-    private bool ExisteMatricula(string matricula) {
-        return _context.Vehiculos
-            .Any(v => v.Matricula == matricula && !v.IsDeleted);
+    private bool ExisteCitaDuplicada(string matricula, DateTime fecha, int idActual = -1) {
+        return _context.Vehiculos.Any(v =>
+            v.Matricula == matricula &&
+            v.FechaInspeccion.Date == fecha.Date &&
+            v.Id != idActual &&
+            !v.IsDeleted
+        );
     }
 }

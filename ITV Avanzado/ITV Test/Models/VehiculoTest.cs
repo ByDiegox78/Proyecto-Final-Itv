@@ -11,13 +11,17 @@ public class VehiculoTest {
         public void ToString_RetornaFormatoValido() {
             var vehiculo = new Vehiculo {
                 Id = 1, Matricula = "4196FMR", Marca = "Fiat", Cilindrada = 900, TipoMotor = Motor.Diesel,
-                DniPropietario = "54407737H",
+                DniPropietario = "54407737H", FechaMatriculacion = DateTime.UtcNow, FechaInspeccion = DateTime.UtcNow
             };
             var result = vehiculo.ToString();
             result.Should().Contain("1");
             result.Should().Contain("4196FMR");
             result.Should().Contain("Fiat");
             result.Should().Contain("900");
+            result.Should().Contain("Diesel");
+            result.Should().Contain($"{DateTime.UtcNow}");
+            result.Should().Contain($"{DateTime.UtcNow}");
+
         }
     }
 }

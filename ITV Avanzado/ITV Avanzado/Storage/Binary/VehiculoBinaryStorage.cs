@@ -34,6 +34,8 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
                 writer.Write(d.Cilindrada);
                 writer.Write(d.TipoMotor);
                 writer.Write(d.DniPropietario);
+                writer.Write(d.FechaMatriculacion);
+                writer.Write(d.FechaInspeccion);
                 writer.Write(d.IsDelete);
                 writer.Write(d.CreatedAt);
                 writer.Write(d.UpdatedAt);
@@ -67,6 +69,8 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
                     reader.ReadInt32(),
                     reader.ReadString(),
                     reader.ReadString(),
+                    reader.ReadString(),
+                    reader.ReadString(),
                     reader.ReadBoolean(),
                     reader.ReadString(),
                     reader.ReadString()
@@ -79,7 +83,6 @@ public class VehiculoBinaryStorage : IVehiculoBinaryStorage {
             return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.InvalidFormat(e.Message));
         }
     }
-    
     private void InitStorage() {
         if (Directory.Exists(AppConfig.DataFolder))
             return;
