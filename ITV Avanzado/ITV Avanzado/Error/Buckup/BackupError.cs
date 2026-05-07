@@ -1,11 +1,11 @@
-﻿using ITV_Avanzado.Error.Common;
+﻿using ITV_Avanzado.Error.Buckup;
+using ITV_Avanzado.Error.Common;
 
 namespace ITV_Avanzado.Error.Buckup;
 /// <summary>
 ///     Contenedor de errores específicos del buckup
 /// </summary>
-public abstract record BuckupError(string Message) : DomainError(Message) {
-    public abstract record BackupError(string Message) : DomainError(Message) {
+public abstract record BackupError(string Message) : DomainError(Message) {
         public sealed record FileNotFound(string FilePath)
             : BackupError($"No se encontro el archivo de backup: {FilePath}");
 
@@ -20,29 +20,29 @@ public abstract record BuckupError(string Message) : DomainError(Message) {
 
         public sealed record DirectoryError(string Details)
             : BackupError($"Error con el directorio de backup: {Details}");
-    }
 }
+
 /// <summary>
 ///     Factory de errores
 /// </summary>
-public static class BuckupErrors {
+public static class BackupErrors {
         public static DomainError FileNotFound(string filePath) {
-            return new BuckupError.BackupError.FileNotFound(filePath);
+            return new BackupError.FileNotFound(filePath);
         }
 
         public static DomainError InvalidBackupFile(string details) {
-            return new BuckupError.BackupError.InvalidBackupFile(details);
+            return new BackupError.InvalidBackupFile(details);
         }
 
         public static DomainError CreationError(string details) {
-            return new BuckupError.BackupError.CreationError(details);
+            return new BackupError.CreationError(details);
         }
 
         public static DomainError RestorationError(string details) {
-            return new BuckupError.BackupError.RestorationError(details);
+            return new BackupError.RestorationError(details);
         }
 
         public static DomainError DirectoryError(string details) {
-            return new BuckupError.BackupError.DirectoryError(details);
+            return new BackupError.DirectoryError(details);
         }
     }
