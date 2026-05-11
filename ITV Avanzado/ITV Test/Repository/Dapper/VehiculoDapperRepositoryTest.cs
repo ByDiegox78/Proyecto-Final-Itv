@@ -5,6 +5,7 @@ using GestionItv.Models;
 using ITV_Avanzado.Error.Vehiculos;
 using ITV_Avanzado.Repository.Dapper;
 using Microsoft.Data.Sqlite;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace ITV_Test.Repository.Dapper;
 
@@ -92,7 +93,7 @@ public class VehiculoDapperRepositoryTest {
             });
 
             _repository.Delete(p.Id);
-            var res = _repository.GetAll(includeDeleted: false);
+            var res = _repository.GetAll(1, 10, false, null);
 
             res.Should().HaveCount(3);
             res.First().Matricula.Should().Be("1234BCD");
@@ -120,7 +121,7 @@ public class VehiculoDapperRepositoryTest {
                 IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
             });
 
-            var res = _repository.GetAll(1, 2);
+            var res = _repository.GetAll(1, 2, false, null);
 
             res.Should().HaveCount(2);
         }
@@ -187,7 +188,7 @@ public class VehiculoDapperRepositoryTest {
             var res = _repository.DeleteAll();
 
             res.Should().BeTrue();
-            _repository.GetAll().Should().BeEmpty();
+            _repository.GetAll(1, 10, false, null).Should().BeEmpty();
         }
 
         [Test]
@@ -195,7 +196,7 @@ public class VehiculoDapperRepositoryTest {
 
             var res = _repository = new VehiculoDapperRepository(_connection, null, false, true);
 
-            res.GetAll().Should().NotBeEmpty();
+            res.GetAll(1, 10, false, null).Should().NotBeEmpty();
         }
         [Test]
         public void Delete_ConBoradoFisico_EliminaCorrectamente() {
@@ -222,7 +223,46 @@ public class VehiculoDapperRepositoryTest {
             var resultado = _repository.DeleteAll();
 
             resultado.Should().BeTrue();
-            _repository.GetAll().Should().BeEmpty();
+            _repository.GetAll(1, 10, false, null).Should().BeEmpty();
+        }
+
+        [TestCase("1234BCD")]
+        [TestCase("Seat Ibiza")]
+        [TestCase("01234567L")]
+        public void GetAll_ConBusquedaPersonalizada_DevuelveCorrecto(string campo) {
+            var vehiculo = new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Diesel,
+                DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo2 = new Vehiculo {
+                Matricula = "2345BCF",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo3 = new Vehiculo {
+                Matricula = "3456BCG",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo4 = new Vehiculo {
+                Matricula = "4567BCH",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            _repository.Create(vehiculo);
+            _repository.Create(vehiculo2);
+            _repository.Create(vehiculo3);
+            _repository.Create(vehiculo4);
+
+            var res = _repository.GetAll(1, 2, false, campo);
+
+            var primero = res.First();
+            res.Should().NotBeNull();
+            (primero.Matricula == campo || 
+             primero.Marca == campo || 
+             primero.DniPropietario == campo)
+                .Should().BeTrue($"porque el resultado debe coincidir con el término de búsqueda '{campo}'");
         }
     }
     [TestFixture]

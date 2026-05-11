@@ -29,18 +29,44 @@ public class VehiculoDapperRepository : IVehiculosRepository {
     }
     
    
-    public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
+       public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+        const string sql = @"
+                SELECT 
+                    Id, 
+                    Matricula, 
+                    Marca, 
+                    Cilindrada, 
+                    Motor, 
+                    Dni AS DniPropietario, -- ASIGNAMOS EL ALIAS AQUÍ
+                    FechaMatriculacion, 
+                    FechaInspeccion, 
+                    IsDeleted, 
+                    CreatedAt, 
+                    UpdatedAt
+                FROM Vehiculos 
+                WHERE (@IncludeDeleted = 1 OR IsDeleted = 0)
+                  AND (@Busqueda IS NULL OR (
+                      Matricula LIKE '%' || @Busqueda || '%' OR
+                      Marca LIKE '%' || @Busqueda || '%' OR
+                      Dni LIKE '%' || @Busqueda || '%'
+                  ))
+                ORDER BY Id 
+                LIMIT @Limit OFFSET @Offset";
+
         try {
-            var sql = includeDeleted
-                ? "SELECT * FROM Vehiculos ORDER BY Id LIMIT @PageSize OFFSET @Offset"
-                : "SELECT * FROM Vehiculos WHERE IsDeleted = 0 ORDER BY Id LIMIT @PageSize OFFSET @Offset";
-            var entities = _connection
-                .Query<VehiculoEntity>(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize }).ToList();
-            return entities.Select(VehiculoMapper.ToModel).OfType<Vehiculo>().ToList();
+
+            var parameters = new {
+                Busqueda = string.IsNullOrWhiteSpace(campoBusqueda) ? null : campoBusqueda,
+                IncludeDeleted = includeDeleted ? 1 : 0,
+                Limit = pageSize,
+                Offset = (page - 1) * pageSize
+            };
+
+            return _connection.Query<Vehiculo>(sql, parameters);
         }
-        catch (Exception e) {
-            _logger.Error(e, "Error al obtener Vehiculos");
-            return [];
+        catch (Exception ex) {
+            _logger.Error(ex, "Error en GetAll Dapper");
+            return Enumerable.Empty<Vehiculo>();
         }
     }
 

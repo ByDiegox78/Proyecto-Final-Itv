@@ -28,23 +28,29 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
         }
     }
     
-    public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
-        try {
-            var query = includeDeleted
-                ? _context.Vehiculos.AsQueryable()
-                : _context.Vehiculos.Where(p => !p.IsDeleted);
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+        var consulta = _context.Vehiculos.AsQueryable();
 
-            var entities = query
-                .OrderBy(p => p.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize);
-
-            return entities.ToModel();
+        if (!includeDeleted) {
+            consulta = consulta.Where(v => v.IsDeleted == false);
         }
-        catch (Exception e) {
-            _logger.Error(e, "Error al obtener Vehiculos");
-            return Enumerable.Empty<Vehiculo>();
-        }    }
+
+        if (!string.IsNullOrWhiteSpace(campoBusqueda)) {
+            consulta = consulta.Where(v => 
+                v.Matricula.Contains(campoBusqueda) || 
+                v.Marca.Contains(campoBusqueda) ||
+                v.Dni.Contains(campoBusqueda) ||
+                v.Cilindrada.ToString().Contains(campoBusqueda)
+            );
+        }
+
+        return consulta
+            .OrderBy(v => v.Id) 
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .AsEnumerable()
+            .Select(e => e.ToModel()!);  
+    }
 
     public Vehiculo? GetById(int id) {
         try {
