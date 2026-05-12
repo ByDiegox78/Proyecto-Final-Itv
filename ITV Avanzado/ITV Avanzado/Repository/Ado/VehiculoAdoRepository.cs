@@ -187,12 +187,15 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         var updated = GetById(id);
         return Result.Success<Vehiculo, DomainError>(updated);
     }
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         using var connection = CreateConnection();
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0";
+        command.CommandText = @"SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0
+            ORDER BY Id LIMIT @Limit OFFSET @Offset";
         command.Parameters.Add(new SqliteParameter("@Matricula", matricula));
+        command.Parameters.Add(new SqliteParameter("@Limit", pageSize));
+        command.Parameters.Add(new SqliteParameter("@Offset", (page - 1) * pageSize));
         var list = new List<Vehiculo>();
         using var reader = command.ExecuteReader();
         while (reader.Read()) {

@@ -100,9 +100,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
             consulta = consulta.Where(v => 
                 v.Matricula.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase) || 
                 v.Marca.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase) ||
-                v.DniPropietario.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase) ||
-                v.Cilindrada.ToString().Contains(campoBusqueda) ||
-                v.TipoMotor.ToString().Contains(campoBusqueda)
+                v.DniPropietario.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase)
             );
         }
         return consulta
@@ -186,9 +184,13 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
         return vehiculo;
     }
 
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         _logger.Debug("Buscando citas con matricula: {matricula}", matricula);
-        return _porId.Values.Where(c => c.Matricula == matricula && !c.IsDeleted).ToList();
+        return _porId.Values.Where(c => c.Matricula == matricula && !c.IsDeleted)
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
     } 
 
     public bool DeleteAll() {

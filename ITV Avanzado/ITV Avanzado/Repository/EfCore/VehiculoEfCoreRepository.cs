@@ -39,9 +39,7 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             consulta = consulta.Where(v => 
                 v.Matricula.Contains(campoBusqueda) || 
                 v.Marca.Contains(campoBusqueda) ||
-                v.Dni.Contains(campoBusqueda) ||
-                v.Cilindrada.ToString().Contains(campoBusqueda)
-            );
+                v.Dni.Contains(campoBusqueda));
         }
 
         return consulta
@@ -146,12 +144,15 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             return null;
         }
     }
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
-        var sql = _context.Vehiculos.Where(c => c.Matricula == matricula && !c.IsDeleted);
-        var list = new List<Vehiculo>();
-        foreach (var s in sql) {
-            list.Add(s.ToModel());   
-        }
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
+        var list = _context.Vehiculos
+            .Where(c => c.Matricula == matricula && !c.IsDeleted)
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .AsEnumerable()
+            .Select(e => e.ToModel()!)
+            .ToList();
         return list;
     }
     public bool DeleteAll() {

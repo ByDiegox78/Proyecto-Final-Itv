@@ -236,6 +236,5 @@
                 resultado.IsFailure.Should().BeTrue();
                 resultado.Error.Should().BeOfType<BackupError.InvalidBackupFile>();
             }
-            
         }
     }

@@ -6,13 +6,12 @@ namespace ITV_Avanzado.Service.Citas;
 
 public interface ICitasService {
 
-    IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true);
+    IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true, string? campoBusqueda = null);
     
     Result<Vehiculo, DomainError> GetById(int id);
 
-    Result<Vehiculo, DomainError> GetByMatricula(string matricula);
+    Result<IEnumerable<Vehiculo>, DomainError> GetByMatricula(string matricula);
 
-    Result<Vehiculo, DomainError> GetByDniPropietario(string dni);
 
     Result<Vehiculo, DomainError> Save(Vehiculo cita);
 
@@ -23,6 +22,12 @@ public interface ICitasService {
     bool DeleteAll();
 
     Result<Vehiculo, DomainError> Restore(int id);
+    
+    IEnumerable<Vehiculo> GetCitasOrderBy(
+        TipoOrdenamiento ordenamiento, 
+        int page = 1, 
+        int pageSize = 10, 
+        bool includeDeleted = true);
 
 
 }

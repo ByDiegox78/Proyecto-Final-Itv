@@ -170,10 +170,11 @@ public class VehiculoDapperRepository : IVehiculosRepository {
             return null;
         }
     }
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         try {
-            var sql = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0";
-            var entity = _connection.Query<VehiculoEntity>(sql, new { Matricula = matricula });
+            var sql = @"SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0
+                ORDER BY Id LIMIT @Limit OFFSET @Offset";
+            var entity = _connection.Query<VehiculoEntity>(sql, new { Matricula = matricula, Limit = pageSize, Offset = (page - 1) * pageSize });
             return entity.ToModel();
             
         }

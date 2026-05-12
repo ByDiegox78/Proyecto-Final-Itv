@@ -33,7 +33,7 @@ public interface IVehiculosRepository {
     /// </summary>
     /// <param name="matricula">Parametro de busqueda</param>
     /// <returns></returns>
-    IEnumerable<Vehiculo>? GetByMatricula(string matricula);
+    IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10);
     /// <summary>
     ///     Elimina todos los vehiculos
     /// </summary>

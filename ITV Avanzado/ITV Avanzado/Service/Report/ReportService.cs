@@ -125,6 +125,18 @@ public class ReportService : IReportService{
     public Result<bool, DomainError> GuardarInformePdf(string html, string fileName) {
         try {
             _logger.Information("Iniciando conversión de HTML a PDF para {FileName}", fileName);
+            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+            converter.Options.PdfPageSize = SelectPdf.PdfPageSize.A4;
+            converter.Options.PdfPageOrientation = SelectPdf.PdfPageOrientation.Portrait;
+            converter.Options.MarginTop = 20;
+            converter.Options.MarginBottom = 20;
+            
+            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(html);
+
+            doc.Save(fileName);
+
+            doc.Close();
+            _logger.Information("PDF generado y guardado con éxito en {Path}", fileName);
             return Result.Success<bool, DomainError>(true);
         }
         catch (Exception ex) {
