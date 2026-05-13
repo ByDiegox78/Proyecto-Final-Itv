@@ -28,23 +28,27 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
         }
     }
     
-    public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
-        try {
-            var query = includeDeleted
-                ? _context.Vehiculos.AsQueryable()
-                : _context.Vehiculos.Where(p => !p.IsDeleted);
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
+        var consulta = _context.Vehiculos.AsQueryable();
 
-            var entities = query
-                .OrderBy(p => p.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize);
-
-            return entities.ToModel();
+        if (!includeDeleted) {
+            consulta = consulta.Where(v => v.IsDeleted == false);
         }
-        catch (Exception e) {
-            _logger.Error(e, "Error al obtener Vehiculos");
-            return Enumerable.Empty<Vehiculo>();
-        }    }
+
+        if (!string.IsNullOrWhiteSpace(campoBusqueda)) {
+            consulta = consulta.Where(v => 
+                v.Matricula.Contains(campoBusqueda) || 
+                v.Marca.Contains(campoBusqueda) ||
+                v.Dni.Contains(campoBusqueda));
+        }
+
+        return consulta
+            .OrderBy(v => v.Id) 
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .AsEnumerable()
+            .Select(e => e.ToModel()!);  
+    }
 
     public Vehiculo? GetById(int id) {
         try {
@@ -140,12 +144,15 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
             return null;
         }
     }
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
-        var sql = _context.Vehiculos.Where(c => c.Matricula == matricula && !c.IsDeleted);
-        var list = new List<Vehiculo>();
-        foreach (var s in sql) {
-            list.Add(s.ToModel());   
-        }
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
+        var list = _context.Vehiculos
+            .Where(c => c.Matricula == matricula && !c.IsDeleted)
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .AsEnumerable()
+            .Select(e => e.ToModel()!)
+            .ToList();
         return list;
     }
     public bool DeleteAll() {

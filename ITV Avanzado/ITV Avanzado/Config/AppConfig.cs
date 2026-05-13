@@ -76,4 +76,8 @@ public class AppConfig {
 
     public static bool IsLogic => Config.GetValue<bool>("IsLogic:Enabled", true);
     
+    public static string ReportDirectory => Path.Combine(
+        AppDomain.CurrentDomain.BaseDirectory,
+        Config.GetValue<string>("Reports:Directory") ?? "reports");
+    
 }

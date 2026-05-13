@@ -85,19 +85,29 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
             
         }
     }
-    public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         _logger.Debug(
             "Obteniendo vehiculos con paginación: página {Page}, tamaño {PageSize}, incluir borrados: {IncludeDeleted}",
             page, pageSize, includeDeleted);
         
-        var query = includeDeleted
-            ? _porId.Values.AsEnumerable()
-            : _porId.Values.Where(e => !e.IsDeleted);
+        var consulta = _porId.Values.AsEnumerable();
 
-        return query
-            .OrderBy(e => e.Id)
+        if (!includeDeleted) 
+            consulta = _porId.Select(e => e.Value)
+                .Where(v => v.IsDeleted == false);
+
+        if (!string.IsNullOrWhiteSpace(campoBusqueda)) {
+            consulta = consulta.Where(v => 
+                v.Matricula.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase) || 
+                v.Marca.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase) ||
+                v.DniPropietario.Contains(campoBusqueda, StringComparison.OrdinalIgnoreCase)
+            );
+        }
+        return consulta
+            .OrderBy(v => v.Id) 
             .Skip((page - 1) * pageSize)
-            .Take(pageSize);    }
+            .Take(pageSize);    
+    }
 
     public Vehiculo? GetById(int id) {
         _logger.Debug("Buscando vehiculo por su matricula: {Id}", id);
@@ -174,9 +184,13 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
         return vehiculo;
     }
 
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         _logger.Debug("Buscando citas con matricula: {matricula}", matricula);
-        return _porId.Values.Where(c => c.Matricula == matricula && !c.IsDeleted).ToList();
+        return _porId.Values.Where(c => c.Matricula == matricula && !c.IsDeleted)
+            .OrderBy(v => v.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
     } 
 
     public bool DeleteAll() {

@@ -31,7 +31,7 @@ public class VehiculoJsonRepositoryTest {
             
             var repoConSemilla = new VehiculoJsonRepository(_temp, true, true); 
             
-            repoConSemilla.GetAll().Should().NotBeEmpty();
+            repoConSemilla.GetAll(1, 10, false, null).Should().NotBeEmpty();
         }
 
         [Test]
@@ -108,7 +108,7 @@ public class VehiculoJsonRepositoryTest {
                 Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "41234571X",
                 IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
             });
-            var res = _repository.GetAll();
+            var res = _repository.GetAll(1, 10, false, null);
 
             res.Should().HaveCount(4);
         }
@@ -136,9 +136,47 @@ public class VehiculoJsonRepositoryTest {
                 IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
             });
 
-            var res = _repository.GetAll(1, 2);
+            var res = _repository.GetAll(1, 2, false, null);
 
             res.Should().HaveCount(2);
+        }
+         [TestCase("1234BCD")]
+        [TestCase("Seat Ibiza")]
+        [TestCase("01234567L")]
+        public void GetAll_ConBusquedaPersonalizada_DevuelveCorrecto(string campo) {
+            var vehiculo = new Vehiculo {
+                Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Diesel,
+                DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo2 = new Vehiculo {
+                Matricula = "2345BCF",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo3 = new Vehiculo {
+                Matricula = "3456BCG",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            var vehiculo4 = new Vehiculo {
+                Matricula = "4567BCH",
+                Marca = "Fiat", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
+                IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
+            };
+            _repository.Create(vehiculo);
+            _repository.Create(vehiculo2);
+            _repository.Create(vehiculo3);
+            _repository.Create(vehiculo4);
+
+            var res = _repository.GetAll(1, 2, false, campo);
+
+            var primero = res.First();
+            res.Should().NotBeNull();
+            (primero.Matricula == campo || 
+             primero.Marca == campo || 
+             primero.DniPropietario == campo)
+                .Should().BeTrue($"porque el resultado debe coincidir con el término de búsqueda '{campo}'");
         }
 
         [Test]
@@ -165,7 +203,7 @@ public class VehiculoJsonRepositoryTest {
             });
 
             _repository.Delete(p.Id);
-            var res = _repository.GetAll(includeDeleted: false);
+            var res = _repository.GetAll(1, 10, false, null);
 
             res.Should().HaveCount(3);
             res.First().Matricula.Should().Be("1234BCD");

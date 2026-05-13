@@ -37,26 +37,40 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         }
     }
     private SqliteConnection CreateConnection() => new(_connectionString);
-    public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true) {
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         _logger.Debug("GetAll: pag {Page}, size {Size}", page, pageSize);
-        var entities = new List<VehiculoEntity>();
-        using var connection = CreateConnection();
-        connection.Open();
-        
-        string sql = "SELECT * FROM Vehiculos ";
-        if (!includeDeleted) sql += "WHERE IsDeleted = 0 ";
-        sql += "ORDER BY Id LIMIT @Limit OFFSET @Offset";
+        var lista = new List<Vehiculo>();
+        try {
+            using var connection = CreateConnection();
+            connection.Open();
+            const string sql = @"
+            SELECT * FROM Vehiculos 
+            WHERE (@IncludeDeleted = 1 OR IsDeleted = 0)
+              AND (@Busqueda IS NULL OR (
+                  Matricula LIKE '%' || @Busqueda || '%' OR
+                  Marca LIKE '%' || @Busqueda || '%' OR
+                  Dni LIKE '%' || @Busqueda || '%'
+              ))
+            ORDER BY Id 
+            LIMIT @Limit OFFSET @Offset";
 
-        using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        command.Parameters.AddWithValue("@Limit", pageSize);
-        command.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
+            using var command = connection.CreateCommand();
+            command.CommandText = sql;
+            command.Parameters.AddWithValue("@Busqueda", string.IsNullOrWhiteSpace(campoBusqueda) ? DBNull.Value : campoBusqueda);
+            command.Parameters.AddWithValue("@IncludeDeleted", includeDeleted ? 1 : 0);
+            command.Parameters.AddWithValue("@Limit", pageSize);
+            command.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read()) {
-            entities.Add(ReadEntity(reader));
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) {
+                lista.Add(ReadEntity(reader).ToModel()!);
+            }
         }
-        return entities.ToModel();
+        catch (Exception ex) {
+            _logger.Error(ex, "Error en GetAll ADO.NET");
+        }
+
+        return lista;
     }
     public Vehiculo? GetById(int id) {
         _logger.Debug("Obteniendo vehiculo con id: {Id}", id);
@@ -130,7 +144,7 @@ public class VehiculoAdoRepository : IVehiculosRepository{
             WHERE Id = @Id;";
         AddParameters(command, vEntity, vEntity.Id);
         command.ExecuteNonQuery();
-        return Result.Success<Vehiculo, DomainError>(vEntity.ToModel());
+        return Result.Success<Vehiculo, DomainError>(vEntity.ToModel()!);
     }
     public Vehiculo? Delete(int id, bool isLogic = true) {
         var exists = GetById(id);
@@ -171,18 +185,27 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         command.Parameters.Add(new SqliteParameter("@UpdatedAt", DateTime.UtcNow.ToString("o")));
         command.ExecuteNonQuery();
         var updated = GetById(id);
-        return Result.Success<Vehiculo, DomainError>(updated);
-    }
-    public IEnumerable<Vehiculo>? GetByMatricula(string matricula) {
+        if (updated == null)
+            return Result.Failure<Vehiculo, DomainError>(
+                VehiculoErrors.NotFound($"No se pudo recuperar el vehículo con id {id} tras restaurarlo"));
+
+        return Result.Success<Vehiculo, DomainError>(updated);    }
+    public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         using var connection = CreateConnection();
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0";
+        command.CommandText = @"SELECT * FROM Vehiculos WHERE Matricula = @Matricula AND IsDeleted = 0
+            ORDER BY Id LIMIT @Limit OFFSET @Offset";
         command.Parameters.Add(new SqliteParameter("@Matricula", matricula));
+        command.Parameters.Add(new SqliteParameter("@Limit", pageSize));
+        command.Parameters.Add(new SqliteParameter("@Offset", (page - 1) * pageSize));
         var list = new List<Vehiculo>();
         using var reader = command.ExecuteReader();
         while (reader.Read()) {
-            list.Add(ReadEntity(reader).ToModel());
+            var entity = ReadEntity(reader);
+            var model = entity.ToModel();
+            if (model != null)
+                list.Add(model);
         }
         return list;    
     }
@@ -220,6 +243,8 @@ public class VehiculoAdoRepository : IVehiculosRepository{
             Cilindrada = reader.GetInt32(reader.GetOrdinal("cilindrada")),
             Motor = reader.GetInt32(reader.GetOrdinal("motor")),
             Dni = reader.GetString(reader.GetOrdinal("dni")),
+            FechaInspeccion = DateTime.Parse(reader.GetString(reader.GetOrdinal("fechainspeccion"))),
+            FechaMatriculacion = DateTime.Parse(reader.GetString(reader.GetOrdinal("fechamatriculacion"))),
             IsDeleted = reader.GetInt32(reader.GetOrdinal("isdeleted")) == 1,
             CreatedAt = DateTime.Parse(reader.GetString(reader.GetOrdinal("createdat"))),
             UpdatedAt = DateTime.Parse(reader.GetString(reader.GetOrdinal("updatedat")))

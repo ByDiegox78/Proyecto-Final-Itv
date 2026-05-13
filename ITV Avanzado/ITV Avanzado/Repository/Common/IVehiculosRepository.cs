@@ -8,7 +8,7 @@ public interface IVehiculosRepository {
     /// <summary>
     ///     Obtiene todos los vehiculos con una paginacion de 5 personas.
     /// </summary>
-    IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 5, bool includeDeleted = true);
+    IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda);
     /// <summary>
     ///     Obtiene un vehiculo por su ID.
     /// </summary>
@@ -33,7 +33,7 @@ public interface IVehiculosRepository {
     /// </summary>
     /// <param name="matricula">Parametro de busqueda</param>
     /// <returns></returns>
-    IEnumerable<Vehiculo>? GetByMatricula(string matricula);
+    IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10);
     /// <summary>
     ///     Elimina todos los vehiculos
     /// </summary>
