@@ -29,7 +29,7 @@ public class VehiculoDapperRepository : IVehiculosRepository {
     }
     
    
-       public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+       public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         const string sql = @"
                 SELECT 
                     Id, 
@@ -145,7 +145,7 @@ public class VehiculoDapperRepository : IVehiculosRepository {
             return Result.Success<Vehiculo, DomainError>(GetById(id)!);
 
         }
-        catch (Exception e) {
+        catch (Exception) {
             return Result.Failure<Vehiculo, DomainError>(
                 VehiculoErrors.DatabaseError("Error al actualizar el vehículo"));
         }

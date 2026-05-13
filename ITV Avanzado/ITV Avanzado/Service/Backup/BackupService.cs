@@ -8,13 +8,15 @@ using Serilog;
 
 namespace ITV_Avanzado.Service.Buckup;
 
-public class BackupService(IStorage<Vehiculo> storage, string? defaultBackupDirectory = null ) : IBuckupService {
-    
-    private readonly string _backDirectory = defaultBackupDirectory;
+public class BackupService(
+    IStorage<Vehiculo> storage, 
+    string? defaultBackupDirectory = null
+    ) 
+    : IBuckupService {
     private readonly ILogger _logger = Log.ForContext<BackupService>();
     
     public Result<string, DomainError> RealizarBackup(IEnumerable<Vehiculo> vehiculos, string? customBackupDirectory = null) {
-        var dir = customBackupDirectory ?? _backDirectory
+        var dir = customBackupDirectory ?? defaultBackupDirectory
             ?? throw new InvalidOperationException("No se a dicho un directorio");
         _logger.Information("Iniciando proceso de backup.");
         var list = vehiculos.ToList();

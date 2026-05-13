@@ -85,7 +85,7 @@ public class VehiculoBinaryRepository : IVehiculosRepository {
             
         }
     }
-    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         _logger.Debug(
             "Obteniendo vehiculos con paginación: página {Page}, tamaño {PageSize}, incluir borrados: {IncludeDeleted}",
             page, pageSize, includeDeleted);

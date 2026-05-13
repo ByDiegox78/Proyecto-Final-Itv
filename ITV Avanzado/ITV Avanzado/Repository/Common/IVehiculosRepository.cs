@@ -8,7 +8,7 @@ public interface IVehiculosRepository {
     /// <summary>
     ///     Obtiene todos los vehiculos con una paginacion de 5 personas.
     /// </summary>
-    IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda);
+    IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda);
     /// <summary>
     ///     Obtiene un vehiculo por su ID.
     /// </summary>

@@ -28,7 +28,7 @@ public class VehiculoEfCoreRepository : IVehiculosRepository {
         }
     }
     
-    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         var consulta = _context.Vehiculos.AsQueryable();
 
         if (!includeDeleted) {

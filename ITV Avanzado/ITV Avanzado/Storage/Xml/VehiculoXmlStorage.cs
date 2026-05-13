@@ -54,7 +54,7 @@ public class VehiculoXmlStorage : IVehiculoXmlStorage {
             var dtos = serializer.Deserialize(streamReader) as List<VehiculoDto>;
             if (dtos == null) 
                 return Result.Failure<IEnumerable<Vehiculo>, DomainError>(StorageErrors.InvalidFormat("El archivo XML no tiene un formato válido o está vacío"));
-            var vehiculos = dtos?.Select(dto => dto.ToModel()).ToList();
+            var vehiculos = dtos.Select(dto => dto.ToModel()).ToList();
             return Result.Success<IEnumerable<Vehiculo>, DomainError>(vehiculos);
             
         } catch (Exception e) {

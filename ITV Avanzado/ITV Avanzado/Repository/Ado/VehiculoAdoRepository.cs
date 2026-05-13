@@ -37,7 +37,7 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         }
     }
     private SqliteConnection CreateConnection() => new(_connectionString);
-    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+    public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         _logger.Debug("GetAll: pag {Page}, size {Size}", page, pageSize);
         var lista = new List<Vehiculo>();
         try {
@@ -144,7 +144,7 @@ public class VehiculoAdoRepository : IVehiculosRepository{
             WHERE Id = @Id;";
         AddParameters(command, vEntity, vEntity.Id);
         command.ExecuteNonQuery();
-        return Result.Success<Vehiculo, DomainError>(vEntity.ToModel());
+        return Result.Success<Vehiculo, DomainError>(vEntity.ToModel()!);
     }
     public Vehiculo? Delete(int id, bool isLogic = true) {
         var exists = GetById(id);
@@ -185,8 +185,11 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         command.Parameters.Add(new SqliteParameter("@UpdatedAt", DateTime.UtcNow.ToString("o")));
         command.ExecuteNonQuery();
         var updated = GetById(id);
-        return Result.Success<Vehiculo, DomainError>(updated);
-    }
+        if (updated == null)
+            return Result.Failure<Vehiculo, DomainError>(
+                VehiculoErrors.NotFound($"No se pudo recuperar el vehículo con id {id} tras restaurarlo"));
+
+        return Result.Success<Vehiculo, DomainError>(updated);    }
     public IEnumerable<Vehiculo>? GetByMatricula(string matricula, int page = 1, int pageSize = 10) {
         using var connection = CreateConnection();
         connection.Open();
@@ -199,7 +202,10 @@ public class VehiculoAdoRepository : IVehiculosRepository{
         var list = new List<Vehiculo>();
         using var reader = command.ExecuteReader();
         while (reader.Read()) {
-            list.Add(ReadEntity(reader).ToModel());
+            var entity = ReadEntity(reader);
+            var model = entity.ToModel();
+            if (model != null)
+                list.Add(model);
         }
         return list;    
     }

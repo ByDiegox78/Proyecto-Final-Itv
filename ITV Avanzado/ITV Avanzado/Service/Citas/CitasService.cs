@@ -18,7 +18,8 @@ public class CitasService(
 
     
     public IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true, string? campoBusqueda = null) {
-        return repository.GetAll(page, pageSize, includeDeleted, campoBusqueda);
+        var res = repository.GetAll(page, pageSize, includeDeleted, campoBusqueda);
+        return res;
     }
     public Result<Vehiculo, DomainError> GetById(int id) {
         if (cache.Get(id) is { } cached) 
@@ -38,9 +39,9 @@ public class CitasService(
     }
     public Result<Vehiculo, DomainError> Save(Vehiculo cita) {
         return ValidarCita(cita)
-            .Ensure(v => !repository.GetByMatricula(v.Matricula).Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
+            .Ensure(v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
                 v => VehiculoErrors.MatriculaInspeccionDuplicada(v.Matricula))
-            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null)
+            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null!)
                     .Count(x => x.DniPropietario == v.DniPropietario && x.FechaInspeccion.Date == v.FechaInspeccion.Date) < 3,
                 v => VehiculoErrors.MaxVehiculosUsageDniError(v.DniPropietario))
             .Bind(v => repository.Create(v))
@@ -53,9 +54,9 @@ public class CitasService(
             })
             .Bind(_ => ValidarCita(cita))
             .Ensure(
-                v => !repository.GetByMatricula(v.Matricula).Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
+                v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
                 v => VehiculoErrors.MatriculaInspeccionDuplicada(v.Matricula))
-            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null)
+            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null!)
                     .Count(x => x.DniPropietario == v.DniPropietario &&
                                 x.FechaInspeccion.Date == v.FechaInspeccion.Date) < 3,
                 v => VehiculoErrors.MaxVehiculosUsageDniError(v.DniPropietario))
@@ -77,7 +78,7 @@ public class CitasService(
         return repository.Restore(id);
     }
     public IEnumerable<Vehiculo> GetCitasOrderBy(TipoOrdenamiento ordenamiento, int page = 1, int pageSize = 10, bool includeDeleted = true) {
-        var citas = repository.GetAll(1, int.MaxValue, includeDeleted, null);
+        var citas = repository.GetAll(1, int.MaxValue, includeDeleted, null!);
         var listaOrdenada = TipoDeOrdenamiento(citas, ordenamiento);
         return listaOrdenada
             .Skip((page - 1) * pageSize)

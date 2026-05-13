@@ -28,7 +28,7 @@
                 _logger.Information("SeedData completado.");
             }
         }
-        public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string campoBusqueda) {
+        public IEnumerable<Vehiculo> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
             _logger.Debug(
                 "Obteniendo citas con paginación: página {Page}, tamaño {PageSize}, incluir borrados: {IncludeDeleted}",
                 page, pageSize, includeDeleted);
