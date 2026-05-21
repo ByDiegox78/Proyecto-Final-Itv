@@ -37,7 +37,7 @@ public class VehiculoDapperRepository : IVehiculosRepository {
                     Marca, 
                     Cilindrada, 
                     Motor, 
-                    Dni AS DniPropietario, -- ASIGNAMOS EL ALIAS AQUÍ
+                    Dni,
                     FechaMatriculacion, 
                     FechaInspeccion, 
                     IsDeleted, 
@@ -62,8 +62,8 @@ public class VehiculoDapperRepository : IVehiculosRepository {
                 Offset = (page - 1) * pageSize
             };
 
-            return _connection.Query<Vehiculo>(sql, parameters);
-        }
+            var entities = _connection.Query<VehiculoEntity>(sql, parameters);
+            return entities.ToModel();        }
         catch (Exception ex) {
             _logger.Error(ex, "Error en GetAll Dapper");
             return Enumerable.Empty<Vehiculo>();

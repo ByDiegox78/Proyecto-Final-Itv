@@ -14,7 +14,6 @@
             
             if (!RegexMatricula.IsMatch(entidad.Matricula)) {
                 errores.Add("La matricula no cumple la regla de NNNNLLL");
-                
             }
             if (string.IsNullOrWhiteSpace(entidad.Marca) || entidad.Marca.Length < 2) {
                 errores.Add("La marca debe contener al manos 2 carazteres");
