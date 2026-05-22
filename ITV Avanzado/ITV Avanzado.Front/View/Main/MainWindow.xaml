@@ -1,0 +1,195 @@
+﻿<Window x:Class="ITV_Avanzado.Front.View.Main.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="ITV VIVES - Sistema de Inspección"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#0B0F1A"
+        Foreground="#C8AA6E">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="28"/>
+        </Grid.RowDefinitions>
+
+        <!-- ================= MENU BAR ================= -->
+        <Menu Grid.Row="0"
+              Background="#121A2A"
+              Foreground="#C8AA6E"
+              Padding="6">
+
+            <MenuItem Header="Archivo">
+                <MenuItem Header="Exportar datos" Click="OnExportarClick"/>
+                <MenuItem Header="Importar datos" Click="OnImportarClick"/>
+                <Separator/>
+                <MenuItem Header="Backup" Click="OnCrearBackupClick"/>
+                <MenuItem Header="Restaurar backup" Click="OnRestaurarBackupClick"/>
+                <Separator/>
+                <MenuItem Header="Salir" Click="OnSalirClick"/>
+            </MenuItem>
+
+            <MenuItem Header="ITV">
+                <MenuItem Header="Citas de inspección" Click="OnCitasClick"/>
+                <MenuItem Header="Historial vehículos" Click="OnInformesClick"/>
+            </MenuItem>
+
+            <MenuItem Header="Herramientas">
+                <MenuItem Header="Configuración" Click="OnConfiguracionClick"/>
+            </MenuItem>
+
+            <MenuItem Header="Ayuda">
+                <MenuItem Header="Acerca de ITV VIVES" Click="OnAcercaDeClick"/>
+            </MenuItem>
+
+        </Menu>
+
+        <!-- ================= TOP BAR ================= -->
+        <Border Grid.Row="1"
+                Background="#121A2A"
+                BorderBrush="#C8AA6E"
+                BorderThickness="0,0,0,1"
+                Padding="10">
+
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- LOGO -->
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                    <iconPacks:PackIconMaterial Kind="Car"
+                                                Width="24"
+                                                Height="24"
+                                                Foreground="#C8AA6E"
+                                                Margin="0,0,10,0"/>
+
+                    <TextBlock Text="ITV VIVES"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#C8AA6E"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- NAV -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+
+                    <Button Content="Dashboard"
+                            Click="OnDashboardClick"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderThickness="0"
+                            Padding="10"
+                            Margin="6,0"/>
+
+                    <Button Content="Citas"
+                            Click="OnCitasClick"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderThickness="0"
+                            Padding="10"
+                            Margin="6,0"/>
+
+                    <Button Content="Informes"
+                            Click="OnInformesClick"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderThickness="0"
+                            Padding="10"
+                            Margin="6,0"/>
+
+                    <Button Content="Backups"
+                            Click="OnBackupClick"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderThickness="0"
+                            Padding="10"
+                            Margin="6,0"/>
+
+                    <Button Content="Import/Export"
+                            Click="OnImportExportClick"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderThickness="0"
+                            Padding="10"
+                            Margin="6,0"/>
+
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <!-- ================= CONTENT (STYLE ACERCA DE) ================= -->
+        <Border Grid.Row="2"
+                Margin="20"
+                Background="#121A2A"
+                CornerRadius="12"
+                BorderBrush="#C8AA6E"
+                BorderThickness="1">
+
+            <Border Margin="10"
+                    Background="#0B0F1A"
+                    CornerRadius="10"
+                    BorderBrush="#2A2F3A"
+                    BorderThickness="1">
+
+                <Frame x:Name="MainFrame"
+                       NavigationUIVisibility="Hidden"
+                       Margin="10"/>
+
+            </Border>
+
+        </Border>
+        <Border Grid.Row="3"
+                Background="#121A2A"
+                BorderBrush="#C8AA6E"
+                BorderThickness="0,1,0,0">
+
+            <Grid Margin="10,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- IZQUIERDA -->
+                <TextBlock x:Name="StatusText"
+                           Text="Listo"
+                           Foreground="#C8AA6E"
+                           VerticalAlignment="Center"
+                           FontSize="11"/>
+
+                <!-- CENTRO -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="#A38A4A"
+                           FontSize="11"/>
+
+                <!-- DERECHA -->
+                <TextBlock x:Name="DeleteTypeText"
+                           Grid.Column="2"
+                           Text=" "
+                           Foreground="#C8AA6E"
+                           VerticalAlignment="Center"
+                           FontSize="11"/>
+
+            </Grid>
+
+        </Border>
+    </Grid>
+</Window>

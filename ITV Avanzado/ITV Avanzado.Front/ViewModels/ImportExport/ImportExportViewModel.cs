@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Xml.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GestionItv.Models;
@@ -30,7 +31,7 @@ public partial class ImportExportViewModel(
     [ObservableProperty] private bool _sustituirDatos;
     
     [RelayCommand]
-    private void ExportCsv() {
+    private void ExportarCsv() {
         try {
             IsLoading = true;
             StatusMessage = "Exportando datos...";
@@ -41,8 +42,6 @@ public partial class ImportExportViewModel(
             };
 
             if (dialog.ShowDialog() == true) {
-                // Usamos null para los filtros que no queremos aplicar en la exportación
-                // y nombres de parámetros para ir directamente a la paginación
                 var citas = _citasService.GetAll(page: 1, pageSize: 1000, includeDeleted: false);
                 var csvPath = Path.Combine(AppConfig.DataFolder, "citas.csv");
                 var result = _importExportService.ExportarDatos(citas, csvPath);
@@ -186,5 +185,156 @@ public partial class ImportExportViewModel(
             IsLoading = false;
         }
     }
-    
+    [RelayCommand]
+    private void ExportarXml() {
+        try {
+            IsLoading = true;
+            StatusMessage = "Exportando XML...";
+
+            var dialog = new SaveFileDialog {
+                Filter = "XML|*.xml",
+                FileName = $"Exportacion_{DateTime.Now:yyyyMMdd}"
+            };
+
+            if (dialog.ShowDialog() == true) {
+                var personas = _citasService.GetAll(1, 1000, false);
+                var xmlSerializer = new XmlSerializer(typeof(List<Vehiculo>));
+                using var writer = new StreamWriter(dialog.FileName);
+                xmlSerializer.Serialize(writer, personas.ToList());
+
+                StatusMessage = "Exportación XML completada";
+                _dialogService.ShowSuccess("Exportación XML completada");
+            }
+        }
+        catch (Exception ex) {
+            _logger.Error(ex, "Error al exportar XML");
+            StatusMessage = "Error al exportar";
+        }
+        finally {
+            IsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ImportarXml() {
+        try {
+            var dialog = new OpenFileDialog {
+                Filter = "XML|*.xml",
+                Title = "Seleccionar archivo XML"
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            IsLoading = true;
+            StatusMessage = "Importando XML...";
+
+            if (SustituirDatos) _citasService.DeleteAll();
+
+            var xmlSerializer = new XmlSerializer(typeof(List<Vehiculo>));
+            using var reader = new StreamReader(dialog.FileName);
+            var personas = (List<Vehiculo>?)xmlSerializer.Deserialize(reader);
+
+            if (personas != null) {
+                var count = 0;
+                foreach (var persona in personas) {
+                    var result = _citasService.Save(persona);
+                    if (result.IsSuccess) count++;
+                }
+
+                StatusMessage = $"Importados {count} registros";
+                _dialogService.ShowSuccess($"Importación completada\n{count} registros");
+            }
+            else {
+                _dialogService.ShowError("El archivo XML no tiene un formato válido");
+                StatusMessage = "Error al importar";
+            }
+        }
+        catch (InvalidOperationException ex) {
+            _logger.Error(ex, "Error al importar XML - formato inválido");
+            _dialogService.ShowError(
+                $"Error al importar XML: El formato del archivo no es válido.\n\nDetalles: {ex.Message}");
+            StatusMessage = "Error al importar";
+        }
+        catch (Exception ex) {
+            _logger.Error(ex, "Error al importar XML");
+            _dialogService.ShowError($"Error al importar: {ex.Message}");
+            StatusMessage = "Error al importar";
+        }
+        finally {
+            IsLoading = false;
+        }
+    }
+    [RelayCommand]
+private void ExportarBinario() {
+    try {
+        IsLoading = true;
+        StatusMessage = "Exportando binario...";
+
+        var dialog = new SaveFileDialog {
+            Filter = "Binario|*.bin",
+            FileName = $"Exportacion_{DateTime.Now:yyyyMMdd}"
+        };
+
+        if (dialog.ShowDialog() == true) {
+            var citas = _citasService.GetAll(page: 1, pageSize: 1000, includeDeleted: false);
+            var binPath = Path.Combine(AppConfig.DataFolder, "citas.bin");
+            var result = _importExportService.ExportarDatos(citas, binPath);
+
+            if (result.IsSuccess) {
+                File.Copy(binPath, dialog.FileName, true);
+                StatusMessage = $"Exportados {result.Value} registros";
+                _dialogService.ShowSuccess($"Exportación completada\n{result.Value} registros");
+            }
+            else {
+                _dialogService.ShowError(result.Error.Message);
+                StatusMessage = "Error al exportar";
+            }
+        }
+    }
+    catch (Exception ex) {
+        _logger.Error(ex, "Error al exportar binario");
+        StatusMessage = "Error al exportar";
+    }
+    finally {
+        IsLoading = false;
+    }
+}
+
+[RelayCommand]
+private void ImportarBinario() {
+    try {
+        var dialog = new OpenFileDialog {
+            Filter = "Binario|*.bin",
+            Title = "Seleccionar archivo binario"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        IsLoading = true;
+        StatusMessage = "Importando binario...";
+
+        if (SustituirDatos) _citasService.DeleteAll();
+
+        var result = _importExportService.ImportarDatosSistema(dialog.FileName);
+
+        if (result.IsSuccess) {
+            var count = result.Value.Count();
+            StatusMessage = $"Importados {count} registros";
+            _dialogService.ShowSuccess($"Importación completada\n{count} registros");
+        }
+        else {
+            _dialogService.ShowError(result.Error.Message);
+            StatusMessage = "Error al importar";
+        }
+    }
+    catch (Exception ex) {
+        _logger.Error(ex, "Error al importar binario");
+        _dialogService.ShowError($"Error al importar: {ex.Message}");
+        StatusMessage = "Error al importar";
+    }
+    finally {
+        IsLoading = false;
+    }
+}
+
 }
