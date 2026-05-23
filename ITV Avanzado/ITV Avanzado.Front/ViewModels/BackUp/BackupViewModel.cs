@@ -47,7 +47,6 @@ public partial class BackupViewModel : ObservableObject {
         try {
             IsLoading = true;
             StatusMessage = "Realizando backups...";
-            MessageBox.Show("Hola");
             var citas = _citasService.GetAll();
             var result = _backupService.RealizarBackup(citas);
 
@@ -69,7 +68,7 @@ public partial class BackupViewModel : ObservableObject {
             IsLoading = false;
         }
     }
-    
+    [RelayCommand]
     private void RestaurarBackup() {
         if (string.IsNullOrEmpty(SelectedBackup)) {
             _dialogService.ShowWarning("Selecciona un bcakup para restaurar");
@@ -116,7 +115,7 @@ public partial class BackupViewModel : ObservableObject {
     }
     
     [RelayCommand]
-    private void EliminarBackups() {
+    private void EliminarBackup() {
         if (string.IsNullOrEmpty(SelectedBackup)) return;
 
         if (!_dialogService.ShowConfirmation($"¿Eliminar el backup {Path.GetFileName(SelectedBackup)}"))

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using ITV_Avanzado.Config;
+using ITV_Avanzado.Front.View.Backup;
 using ITV_Avanzado.Front.View.EmportExport;
 using ITV_Avanzado.Front.ViewModels.ImportExport;
 using ITV_Avanzado.Front.ViewModels.Main;
@@ -100,7 +101,7 @@ public partial class MainWindow : Window {
         // MainFrame.Navigate(new DashboardView());
     }
     private void OnBackupClick(object sender, RoutedEventArgs e) {
-        //MainFrame.Navigate(new BackupView());
+        MainFrame.Navigate(new BackupView());
     }
 
 }

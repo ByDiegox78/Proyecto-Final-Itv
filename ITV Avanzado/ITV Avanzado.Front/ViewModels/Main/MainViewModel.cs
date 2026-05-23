@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ITV_Avanzado.Front.View.AcercaDe;
+using ITV_Avanzado.Front.View.Backup;
 using ITV_Avanzado.Service.Buckup;
 using ITV_Avanzado.Service.Citas;
 using ITV_Avanzado.Service.Dialogs;
@@ -63,10 +64,10 @@ public partial class MainViewModel(
     //     OnNavigateRequested?.Invoke(new GraficoView());
     // }
     //
-    // [RelayCommand]
-    // private void NavigateToBackup() {
-    //     OnNavigateRequested?.Invoke(new BackupView());
-    // }
+    [RelayCommand]
+    private void NavigateToBackup() {
+        OnNavigateRequested?.Invoke(new BackupView());
+    }
     //
     // [RelayCommand]
     // private void NavigateToImportExport() {

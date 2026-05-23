@@ -2,6 +2,7 @@
 using ITV_Avanzado.Front.Service.Dialogs;
 using ITV_Avanzado.Front.View.AcercaDe;
 using ITV_Avanzado.Front.View.Main;
+using ITV_Avanzado.Front.ViewModels.BackUp;
 using ITV_Avanzado.Front.ViewModels.ImportExport;
 using ITV_Avanzado.Service.Dialogs;
 using ITV_Avanzado.Front.ViewModels.Main;
@@ -20,6 +21,7 @@ public partial class App : Application {
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<ImportExportViewModel>();
+            services.AddSingleton<BackupViewModel>();
         });
 
         var mainWindow = new MainWindow {
