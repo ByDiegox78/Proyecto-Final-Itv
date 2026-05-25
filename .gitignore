@@ -4,6 +4,10 @@ bin/
 obj/
 out/
 
+# Datos generados en tiempo de ejecución
+data/
+**/data/
+
 # Configuración de IDEs
 .idea/
 .vs/
@@ -12,6 +16,10 @@ out/
 
 # Archivos temporales o locales
 *.user
+
+# Logs de la aplicación
+log/
+**/log/
 *.suo
 *.userprefs
 *.log

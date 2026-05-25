@@ -1,0 +1,189 @@
+﻿<Window x:Class="ITV_Avanzado.Front.View.Cita.CitaEdit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}"
+        Height="540" Width="580"
+        WindowStartupLocation="CenterOwner"
+        Background="#0A101A"
+        Foreground="#C8AA6E">
+
+    <Window.Resources>
+
+        <!-- LABEL -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#C8AA6E"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0 0 0 4"/>
+        </Style>
+
+        <!-- INPUT BASE -->
+        <Style x:Key="FieldBase" TargetType="Control">
+            <Setter Property="Background" Value="#111822"/>
+            <Setter Property="Foreground" Value="#E8D5A3"/>
+            <Setter Property="BorderBrush" Value="#2A2F3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style x:Key="FieldTextBox" TargetType="TextBox" BasedOn="{StaticResource FieldBase}">
+            <Setter Property="Padding" Value="6"/>
+        </Style>
+
+        <Style x:Key="FieldComboBox" TargetType="ComboBox" BasedOn="{StaticResource FieldBase}"/>
+
+        <Style x:Key="FieldDatePicker" TargetType="DatePicker" BasedOn="{StaticResource FieldBase}"/>
+
+        <!-- BOTÓN CANCELAR -->
+        <Style x:Key="CancelBtn" TargetType="Button">
+            <Setter Property="Background" Value="#1A1A2A"/>
+            <Setter Property="Foreground" Value="#C8AA6E"/>
+            <Setter Property="BorderBrush" Value="#2A2F3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="18,8"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- BOTÓN GUARDAR -->
+        <Style x:Key="SaveBtn" TargetType="Button">
+            <Setter Property="Background" Value="#C8AA6E"/>
+            <Setter Property="Foreground" Value="#0B0F1A"/>
+            <Setter Property="BorderBrush" Value="#F0C75E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="18,8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- SCROLLBAR LIMPIO -->
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Background" Value="#0F1923"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="#0F1923" Width="10">
+                            <Track Name="PART_Track">
+                                <Track.Thumb>
+                                    <Thumb Background="#C8AA6E"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Margin="15"
+            Background="#121A2A"
+            BorderBrush="#C8AA6E"
+            BorderThickness="1"
+            CornerRadius="10">
+
+        <Grid Margin="20">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <TextBlock Text="{Binding WindowTitle}"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#C8AA6E"
+                       Margin="0 0 0 18"/>
+
+            <!-- FORM -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Background="Transparent"
+                          BorderThickness="0">
+
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Matrícula" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             Text="{Binding FormData.Matricula}"
+                             Style="{StaticResource FieldTextBox}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Marca" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             Text="{Binding FormData.Marca}"
+                             Style="{StaticResource FieldTextBox}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Cilindrada" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             Text="{Binding FormData.Cilindrada}"
+                             Style="{StaticResource FieldTextBox}"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Motor" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1"
+                              ItemsSource="{Binding Motors}"
+                              SelectedItem="{Binding FormData.Motor}"
+                              Style="{StaticResource FieldComboBox}"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="DNI" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="4" Grid.Column="1"
+                             Text="{Binding FormData.DniPropietario}"
+                             Style="{StaticResource FieldTextBox}"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Matriculación" Style="{StaticResource FieldLabel}"/>
+                    <DatePicker Grid.Row="5" Grid.Column="1"
+                                SelectedDate="{Binding FormData.FechaMatriculacion}"
+                                Style="{StaticResource FieldDatePicker}"/>
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Inspección" Style="{StaticResource FieldLabel}"/>
+                    <DatePicker Grid.Row="6" Grid.Column="1"
+                                SelectedDate="{Binding FormData.FechaInspeccion}"
+                                Style="{StaticResource FieldDatePicker}"/>
+
+                </Grid>
+
+            </ScrollViewer>
+
+            <!-- BOTONES -->
+            <Border Grid.Row="2"
+                    BorderBrush="#2A2F3A"
+                    BorderThickness="1 0 0 0"
+                    Padding="0 15 0 0"
+                    Margin="0 15 0 0">
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                    <Button Content="Cancelar"
+                            Command="{Binding CancelCommand}"
+                            Style="{StaticResource CancelBtn}"/>
+
+                    <Button Content="Guardar"
+                            Command="{Binding SaveCommand}"
+                            Style="{StaticResource SaveBtn}"/>
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+    </Border>
+</Window>

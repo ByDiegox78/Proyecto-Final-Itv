@@ -1,0 +1,131 @@
+﻿<Page x:Class="ITV_Avanzado.Front.View.DashBoard.DashBoardView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      Background="#0B0F1A"
+      Foreground="#C8AA6E">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0"
+                Background="#121A2A"
+                BorderBrush="#C8AA6E"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="15"
+                Margin="0,0,0,20">
+
+            <StackPanel Orientation="Horizontal">
+
+                <iconPacks:PackIconMaterial Kind="Car" Width="32" Height="32"
+                                            Foreground="#C8AA6E"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"/>
+
+                <StackPanel>
+                    <TextBlock Text="DASHBOARD ITV VIVES"
+                               FontSize="22" FontWeight="Bold" Foreground="#C8AA6E"/>
+                    <TextBlock Text="Panel de control del sistema"
+                               FontSize="12" Foreground="#A38A4A"/>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <!-- TARJETAS -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="#121A2A" BorderBrush="#C8AA6E"
+                    BorderThickness="1" CornerRadius="10" Margin="0,0,5,0" Padding="15">
+                <StackPanel HorizontalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ClipboardText" Width="28" Height="28"
+                                                Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding TotalCitas}" FontSize="28" FontWeight="Bold"
+                               Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Total Citas" FontSize="11" Foreground="#A38A4A" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#121A2A" BorderBrush="#C8AA6E"
+                    BorderThickness="1" CornerRadius="10" Margin="5,0" Padding="15">
+                <StackPanel HorizontalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="GasStation" Width="28" Height="28"
+                                                Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Gasolina}" FontSize="28" FontWeight="Bold"
+                               Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Gasolina" FontSize="11" Foreground="#A38A4A" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Background="#121A2A" BorderBrush="#C8AA6E"
+                    BorderThickness="1" CornerRadius="10" Margin="5,0" Padding="15">
+                <StackPanel HorizontalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="Engine" Width="28" Height="28"
+                                                Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Diesel}" FontSize="28" FontWeight="Bold"
+                               Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Diesel" FontSize="11" Foreground="#A38A4A" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Background="#121A2A" BorderBrush="#C8AA6E"
+                    BorderThickness="1" CornerRadius="10" Margin="5,0" Padding="15">
+                <StackPanel HorizontalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="Leaf" Width="28" Height="28"
+                                                Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Hibrido}" FontSize="28" FontWeight="Bold"
+                               Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Híbrido" FontSize="11" Foreground="#A38A4A" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Background="#121A2A" BorderBrush="#C8AA6E"
+                    BorderThickness="1" CornerRadius="10" Margin="5,0,0,0" Padding="15">
+                <StackPanel HorizontalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="LightningBolt" Width="28" Height="28"
+                                                Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Electrico}" FontSize="28" FontWeight="Bold"
+                               Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Eléctrico" FontSize="11" Foreground="#A38A4A" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+        <!-- Citas para Hoy -->
+        <Border Grid.Row="2" Background="#121A2A" BorderBrush="#C8AA6E"
+                BorderThickness="1" CornerRadius="10" Padding="30"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Width="400" Height="250">
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                <iconPacks:PackIconMaterial Kind="CalendarMonth" Width="64" Height="64"
+                                            Foreground="#C8AA6E" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+                <TextBlock Text="{Binding CitasParaHoy}" FontSize="48" FontWeight="Bold"
+                           Foreground="#C8AA6E" HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Citas para Hoy" FontSize="16" Foreground="#A38A4A"
+                           HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            </StackPanel>
+
+        </Border>
+
+    </Grid>
+</Page>

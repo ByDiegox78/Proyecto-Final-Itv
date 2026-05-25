@@ -33,7 +33,7 @@ public class ReportService : IReportService{
             Hibrido = list.Count(c => c.TipoMotor == Motor.Hibrido),
             Electrico = list.Count(c => c.TipoMotor == Motor.Electrico),
 
-            CitasParaHoy = list.Count(c => c.FechaInspeccion == DateTime.UtcNow.Date)
+            CitasParaHoy = list.Count(c => c.FechaInspeccion == DateTime.Now.Date)
         };
     }
 

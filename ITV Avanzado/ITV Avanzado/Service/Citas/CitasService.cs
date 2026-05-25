@@ -54,10 +54,10 @@ public class CitasService(
             })
             .Bind(_ => ValidarCita(cita))
             .Ensure(
-                v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
+                v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.Id != id && x.FechaInspeccion.Date == v.FechaInspeccion.Date),
                 v => VehiculoErrors.MatriculaInspeccionDuplicada(v.Matricula))
             .Ensure(v => repository.GetAll(1, int.MaxValue, false, null!)
-                    .Count(x => x.DniPropietario == v.DniPropietario &&
+                    .Count(x => x.Id != id && x.DniPropietario == v.DniPropietario &&
                                 x.FechaInspeccion.Date == v.FechaInspeccion.Date) < 3,
                 v => VehiculoErrors.MaxVehiculosUsageDniError(v.DniPropietario))
             .Bind(p => repository.Update(id, p));
