@@ -1,7 +1,10 @@
 ﻿using System.Xml.Serialization;
 
 namespace ITV_Avanzado.Dto;
-
+/// <summary>
+///     Objeto de Transferencia de Datos para citas.
+///     Se utiliza para y deserialización de datos de citas
+/// </summary>
 [XmlRoot("Cita")]
 [XmlType("CitaDto")]
 public record CitaDto(

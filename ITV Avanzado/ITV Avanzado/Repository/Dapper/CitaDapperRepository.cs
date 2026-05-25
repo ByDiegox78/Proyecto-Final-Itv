@@ -29,7 +29,8 @@ public class CitaDapperRepository : ICitaRepository {
     }
     
    
-       public IEnumerable<Cita> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
+    /// <inheritdoc cref="ICitaRepository.GetAll(int, int, bool, string)" />
+    public IEnumerable<Cita> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda) {
         const string sql = @"
                 SELECT 
                     Id, 

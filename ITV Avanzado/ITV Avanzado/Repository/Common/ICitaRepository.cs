@@ -6,40 +6,43 @@ namespace ITV_Avanzado.Repository.Common;
 
 public interface ICitaRepository {
     /// <summary>
-    ///     Obtiene todos los vehiculos con una paginacion de 5 personas.
+    ///     Obtiene todas las citas con paginación y filtros opcionales.
     /// </summary>
     IEnumerable<Cita> GetAll(int page, int pageSize, bool includeDeleted, string? campoBusqueda);
     /// <summary>
-    ///     Obtiene un vehiculo por su ID.
+    ///     Obtiene una cita por su ID.
     /// </summary>
     Cita? GetById(int id);
     /// <summary>
-    ///     Crea una nuevo vehiculo en el sistema.
+    ///     Crea una nueva cita en el sistema.
     /// </summary>
-    /// <returns>Result con el vehiculo creado o error de dominio.</returns>
+    /// <returns>Result con la cita creada o error de dominio.</returns>
     Result<Cita, DomainError> Create(Cita cita);
     /// <summary>
-    ///     Actualiza un vehiculo existente.
+    ///     Actualiza una cita existente.
     /// </summary>
-    /// <returns>Result con el vehiculo actualizado o error de dominio.</returns>
+    /// <returns>Result con la cita actualizada o error de dominio.</returns>
     Result<Cita, DomainError> Update(int id, Cita cita);
 
     /// <summary>
-    ///     Elimina un vehiculo.
+    ///     Elimina una cita (física o lógicamente según <paramref name="isLogic"/>).
     /// </summary>
     Cita? Delete(int id, bool isLogic);
     /// <summary>
-    ///     Busca el vehiculo por su matricula
+    ///     Busca citas por matrícula con paginación.
     /// </summary>
-    /// <param name="matricula">Parametro de busqueda</param>
-    /// <returns></returns>
+    /// <param name="matricula">Matrícula a buscar.</param>
+    /// <param name="page">Número de página (1-based).</param>
+    /// <param name="pageSize">Tamaño de página.</param>
     IEnumerable<Cita>? GetByMatricula(string matricula, int page = 1, int pageSize = 10);
     /// <summary>
-    ///     Elimina todos los vehiculos
+    ///     Elimina todas las citas del sistema.
     /// </summary>
-    /// <returns></returns>
     bool DeleteAll();
-    
+    /// <summary>
+    ///     Restaura una cita eliminada lógicamente.
+    /// </summary>
+    /// <returns>Result con la cita restaurada o error de dominio.</returns>
     Result<Cita, DomainError> Restore(int id);
 
 

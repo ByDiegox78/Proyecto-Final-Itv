@@ -1,7 +1,16 @@
 ﻿using Serilog;
 
 namespace ITV_Avanzado.Cache;
-
+/// <summary>
+///     Implementación de cache basada en el algoritmo LRU (Least Recently Used).
+///     Cuando la capacidad se agota, elimina el elemento que lleva más tiempo sin ser utilizado.
+///     Características:
+///     - Capacidad fija definida mediante el constructor.
+///     - Utiliza un <see cref="Dictionary{TKey, TValue}" /> para acceso instantáneo O(1).
+///     - Utiliza una <see cref="LinkedList{TKey}" /> para gestionar el historial de uso.
+///     - Cada acceso (Get) o actualización (Add) mueve el elemento al final de la lista.
+///     - El elemento situado al inicio de la lista (First) es siempre el candidato al古屋jo.
+/// </summary>
 public class CacheLru<TKey, TValue> : ICache<TKey, TValue>
     where TKey : notnull {
     private readonly int _capacity;

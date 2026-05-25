@@ -17,10 +17,12 @@ public class CitasService(
     private readonly ILogger _logger = Log.ForContext<CitasService>();
 
     
+    /// <inheritdoc cref="ICitasService.GetAll(int, int, bool, string)" />
     public IEnumerable<Cita> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true, string? campoBusqueda = null) {
         var res = repository.GetAll(page, pageSize, includeDeleted, campoBusqueda);
         return res;
     }
+    /// <inheritdoc cref="ICitasService.GetById(int)" />
     public Result<Cita, DomainError> GetById(int id) {
         if (cache.Get(id) is { } cached) 
             return Result.Success<Cita, DomainError>(cached);
@@ -31,12 +33,14 @@ public class CitasService(
         }
         return Result.Failure<Cita, DomainError>(CitaErrors.NotFound(id.ToString()));
     }
+    /// <inheritdoc cref="ICitasService.GetByMatricula(string)" />
     public Result<IEnumerable<Cita>, DomainError> GetByMatricula(string matricula) {
         if (repository.GetByMatricula(matricula) is { } v) {
             return Result.Success<IEnumerable<Cita>, DomainError>(v);
         }
         return Result.Failure<IEnumerable<Cita>, DomainError>(CitaErrors.NotFound(matricula));
     }
+    /// <inheritdoc cref="ICitasService.Save(Cita)" />
     public Result<Cita, DomainError> Save(Cita cita) {
         return ValidarCita(cita)
             .Ensure(v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
@@ -47,6 +51,7 @@ public class CitasService(
             .Bind(v => repository.Create(v))
             .Tap(creada => cache.Add(creada.Id, creada));
     }
+    /// <inheritdoc cref="ICitasService.Update(int, Cita)" />
     public Result<Cita, DomainError> Update(int id, Cita cita) {
         return CheckExists(id)
             .Tap(p => {
@@ -62,6 +67,7 @@ public class CitasService(
                 v => CitaErrors.MaxCitasUsageDniError(v.DniPropietario))
             .Bind(p => repository.Update(id, p));
     }
+    /// <inheritdoc cref="ICitasService.Delete(int, bool)" />
     public Result<Cita, DomainError> Delete(int id, bool isLogical = true) {
         return CheckExists(id)
             .Tap(p => {
@@ -69,14 +75,17 @@ public class CitasService(
             })
             .Map(p => repository.Delete(id, isLogical)!);
     }
+    /// <inheritdoc cref="ICitasService.DeleteAll()" />
     public bool DeleteAll() {
         _logger.Warning("Eliminando todas las citas del sistema");
         return repository.DeleteAll();
     }
+    /// <inheritdoc cref="ICitasService.Restore(int)" />
     public Result<Cita, DomainError> Restore(int id) {
         _logger.Information("Restaurando cita con ID {Id}", id);
         return repository.Restore(id);
     }
+    /// <inheritdoc cref="ICitasService.GetCitasOrderBy(TipoOrdenamiento, int, int, bool)" />
     public IEnumerable<Cita> GetCitasOrderBy(TipoOrdenamiento ordenamiento, int page = 1, int pageSize = 10, bool includeDeleted = true) {
         var citas = repository.GetAll(1, int.MaxValue, includeDeleted, null!);
         var listaOrdenada = TipoDeOrdenamiento(citas, ordenamiento);

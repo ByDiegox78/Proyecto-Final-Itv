@@ -1,5 +1,7 @@
 ﻿namespace GestionItv.Models;
-
+/// <summary>
+///     Representa una cita en el sistema.
+/// </summary>
 public record Cita {
     public int Id { get; init; }
     public string Matricula { get; init; } = string.Empty;
