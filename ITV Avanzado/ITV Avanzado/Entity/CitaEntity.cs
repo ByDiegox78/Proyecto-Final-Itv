@@ -2,7 +2,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ITV_Avanzado.Entity;
-
+/// <summary>
+///     Entidad de base de datos para citas.
+/// </summary>
 [Table("Citas")]
 public class CitaEntity {
     [Key]

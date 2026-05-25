@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace ITV_Avanzado.Entity;
-
+/// <summary>
+///     Contexto de Entity Framework Core para la base de datos de citas.
+/// </summary>
 public class AppDbContext : DbContext {
     public DbSet<CitaEntity> Citas { get; set; } = null!;
 

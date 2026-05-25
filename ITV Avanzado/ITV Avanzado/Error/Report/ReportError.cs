@@ -1,7 +1,9 @@
 ﻿using ITV_Avanzado.Error.Common;
 
 namespace ITV_Avanzado.Error.Report;
-
+/// <summary>
+///     Contenedor de errores específicos para el dominio de report.
+/// </summary>
 public abstract record ReportError(string Message) : DomainError(Message) {
     public sealed record GenerationError(string Details)
         : ReportError($"Error al generar el informe: {Details}");

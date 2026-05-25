@@ -1,8 +1,14 @@
 ﻿using GestionItv.Models;
 
 namespace ITV_Avanzado.Factory;
-
+/// <summary>
+///     Factoría con datos semilla fijos para registros inmutables de citas.
+/// </summary>
 public static class CitasFactory {
+    /// <summary>
+    ///     Genera la semilla de datos inicial.
+    /// </summary>
+    /// <returns>Enumerable con datos de demostración</returns>
     public static IEnumerable<Cita> Seed() {
         var now = DateTime.Now;
         var today = now.Date;

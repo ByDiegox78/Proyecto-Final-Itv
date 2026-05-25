@@ -1,7 +1,9 @@
 ﻿using ITV_Avanzado.Error.Common;
 
 namespace ITV_Avanzado.Error.Citas;
-
+/// <summary>
+///     Contenedor de errores específicos para el dominio de citas.
+/// </summary>
 public record CitaError(string Message) : DomainError(Message) {
     public sealed record NotFound(string Id)
         : CitaError($"No se ha encontrado ningun vehiculo con el identificador: {Id}");

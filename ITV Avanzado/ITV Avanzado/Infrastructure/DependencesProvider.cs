@@ -24,8 +24,16 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ITV_Avanzado.Infrastructure;
-
+/// <summary>
+///     Proveedor de dependencias centralizado para toda la aplicación.
+///     Configura la inyección de dependencias registrando repositorios, servicios, validadores y caches.
+/// </summary>
 public class DependencesProvider {
+    /// <summary>
+    ///     Construye y configura el contenedor de inyección de dependencias.
+    /// </summary>
+    /// <param name="configureAdditional">Callback opcional para registrar servicios adicionales.</param>
+    /// <returns>Proveedor de servicios configurado.</returns>
     public static IServiceProvider BuildServiceProvider(Action<IServiceCollection>? configureAdditional = null) {
         var services = new ServiceCollection();
         CleanData();
@@ -36,14 +44,14 @@ public class DependencesProvider {
         RegisterRepositories(services);
         RegisterServices(services);
         
-        // Permitir extensión con servicios adicionales
         configureAdditional?.Invoke(services);
         
-        // Construir el proveedpr de servicios y devolverlo
         return services.BuildServiceProvider();
 
     }
-
+    /// <summary>
+    ///     Registra el almacenamiento según la configuración del appsettings.json.
+    /// </summary>
     private static void RegisterStorages(IServiceCollection service) {
         service.AddTransient<IStorage<Cita>>(sp => {
             var type = AppConfig.StorageType.ToLower();
@@ -56,9 +64,12 @@ public class DependencesProvider {
             };
         });
     }
-    
+    /// <summary>
+    ///     Registra el repositorio de citas según la configuración del appsettings.json.
+    ///     Permite intercambiar entre Memory, JSON, Binary, Dapper, EFCore, Ado.
+    /// </summary>
     private static void RegisterRepositories(IServiceCollection services) {
-        // Registrar repositorio de personas según configuración
+        // Registrar repositorio de citas según configuración
         services.AddSingleton<ICitaRepository>(sp => {
             var repoType = AppConfig.RepositoryType.ToLower();
             return repoType switch {
@@ -75,6 +86,9 @@ public class DependencesProvider {
             };
         });
     }
+    /// <summary>
+    ///     Crea el repositorio EfCore con conexión SQLite.
+    /// </summary>
     private static CitaEfCoreRepository CreateEfRepository(bool dropData, bool seedData) {
         var dataFolder = AppConfig.DataFolder;
         if (!Directory.Exists(dataFolder))
@@ -85,7 +99,9 @@ public class DependencesProvider {
         
         return new CitaEfCoreRepository(context, dropData, seedData);
     }
-
+    /// <summary>
+    ///     Crea el repositorio Dapper con conexión SQLite.
+    /// </summary>
     private static CitaDapperRepository CreateDapperRepository(bool data, bool seed) {
         var dataFolder = AppConfig.DataFolder;
         if (!Directory.Exists(dataFolder)) {
@@ -98,24 +114,33 @@ public class DependencesProvider {
         return new CitaDapperRepository(connection, () => connection.Close(), data, seed);
     }
 
+    /// <summary>
+    ///     Registra el validador de citas.
+    /// </summary>
     private static void RegisterValidators(IServiceCollection service) {
         service.AddTransient<IValidator<Cita>, ValidadorCitas>();
     }
+    /// <summary>
+    ///     Registra la caché LRU para citas con el tamaño configurado.
+    /// </summary>
     private static void RegisterCaches(IServiceCollection services) {
         services.AddSingleton<ICache<int, Cita>>(sp =>
             new CacheLru<int, Cita>(AppConfig.CacheSize));
     }
     
-
+    /// <summary>
+    ///     Limpia los directorios de salida si se requiere regenerar datos.
+    /// </summary>
     private static void CleanData() {
         if (AppConfig.DropData || AppConfig.SeedData) {
             CleanDirectory(AppConfig.ReportDirectory);
         }
     }
 
+    /// <summary>
+    ///     Registra los servicios de negocio: Backup, Reportes, Import/Export y Citas.
+    /// </summary>
     private static void RegisterServices(IServiceCollection services) {
-        //services.AddSingleton<IDialogService, DialogService>();
-
         services.AddTransient<IBuckupService, BackupService>(sp =>
             new BackupService(sp.GetRequiredService<IStorage<Cita>>(), AppConfig.BackupDirectory));
 
@@ -132,6 +157,10 @@ public class DependencesProvider {
             )
         );
     }
+    /// <summary>
+    ///     Vacía un directorio eliminando todos los archivos y subdirectorios.
+    /// </summary>
+    /// <param name="path">Ruta del directorio a limpiar.</param>
     private static void CleanDirectory(string path) {
         try {
             if (Directory.Exists(path)) {
