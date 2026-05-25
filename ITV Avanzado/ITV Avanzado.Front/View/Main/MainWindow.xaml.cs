@@ -2,7 +2,10 @@
 using System.Windows.Controls;
 using ITV_Avanzado.Config;
 using ITV_Avanzado.Front.View.Backup;
+using ITV_Avanzado.Front.View.Cita;
+using ITV_Avanzado.Front.View.DashBoard;
 using ITV_Avanzado.Front.View.EmportExport;
+using ITV_Avanzado.Front.View.Informe;
 using ITV_Avanzado.Front.ViewModels.ImportExport;
 using ITV_Avanzado.Front.ViewModels.Main;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +17,11 @@ public partial class MainWindow : Window {
     private bool _exitConfirmedViaMenu;
     public MainWindow() {
         InitializeComponent();
+        
         var viewModel = App.Services.GetRequiredService<MainViewModel>();
         DataContext = viewModel;
         Log.Information("Main Inicializado");
-        //MainFrame.Navigate(new DashBoardView());
+        MainFrame.Navigate(new DashBoardView());
         DeleteTypeText.Text = $"Borrado: {(AppConfig.IsLogic ? "Logico" : "Fisico")}";
         Closing += (s, e) => {
             if (_exitConfirmedViaMenu) return;
@@ -58,22 +62,20 @@ public partial class MainWindow : Window {
     private void OnExportarClick(object sender, RoutedEventArgs e) {
       MainFrame.Navigate(new ImportExportView());
     }
-    private void OnImportarClick(object sender, RoutedEventArgs e) {
-      //  MainFrame.Navigate(new ImportExportView());
-    }
+  
 
     private void OnCrearBackupClick(object sender, RoutedEventArgs e) {
-      //  MainFrame.Navigate(new BackupView());
+      MainFrame.Navigate(new BackupView());
     }
 
-    private void OnRestaurarBackupClick(object sender, RoutedEventArgs e) {
-     //   MainFrame.Navigate(new BackupView());
+    private void OnRestaurarBackupClick(object sender, RoutedEventArgs e) { 
+        MainFrame.Navigate(new BackupView());
     }
     private void OnCitasClick(object sender, RoutedEventArgs e) {
-        //   MainFrame.Navigate(new BackupView());
+           MainFrame.Navigate(new CitaView());
     }
     private void OnInformesClick(object sender, RoutedEventArgs e) {
-        //MainFrame.Navigate(new InformesView());
+        MainFrame.Navigate(new InformeView());
     }
     private void OnConfiguracionClick(object sender, RoutedEventArgs e) {
         var tipoBorrado = AppConfig.IsLogic ? "Lógico" : "Físico";
@@ -97,8 +99,7 @@ public partial class MainWindow : Window {
         MainFrame.Navigate(new ImportExportView());
     }
 
-    private void OnDashboardClick(object sender, RoutedEventArgs e) {
-        // MainFrame.Navigate(new DashboardView());
+    private void OnDashboardClick(object sender, RoutedEventArgs e) { MainFrame.Navigate(new DashBoardView());
     }
     private void OnBackupClick(object sender, RoutedEventArgs e) {
         MainFrame.Navigate(new BackupView());

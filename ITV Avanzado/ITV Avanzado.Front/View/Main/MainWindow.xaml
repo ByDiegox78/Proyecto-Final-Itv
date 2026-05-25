@@ -25,11 +25,9 @@
               Padding="6">
 
             <MenuItem Header="Archivo">
-                <MenuItem Header="Exportar datos" Click="OnExportarClick"/>
-                <MenuItem Header="Importar datos" Click="OnImportarClick"/>
+                <MenuItem Header="Exp/Imp datos" Click="OnExportarClick"/>
                 <Separator/>
                 <MenuItem Header="Backup" Click="OnCrearBackupClick"/>
-                <MenuItem Header="Restaurar backup" Click="OnRestaurarBackupClick"/>
                 <Separator/>
                 <MenuItem Header="Salir" Click="OnSalirClick"/>
             </MenuItem>

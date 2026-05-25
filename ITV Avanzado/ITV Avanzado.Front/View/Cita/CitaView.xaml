@@ -1,0 +1,246 @@
+﻿<Page x:Class="ITV_Avanzado.Front.View.Cita.CitaView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="750"
+      d:DesignWidth="1300"
+      Title="Gestión de Citas"
+      Background="#0A101A">
+
+    <Page.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- BOTONES MÁS GRANDES -->
+        <Style x:Key="LolButton" TargetType="Button">
+            <Setter Property="Background" Value="#102030"/>
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Setter Property="BorderBrush" Value="#C8AA6E"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="18,10"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#17344F"/>
+                    <Setter Property="BorderBrush" Value="#F0C75E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- TEXTBOX MÁS GRANDE -->
+        <Style x:Key="LolTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#1A2530"/>
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Setter Property="BorderBrush" Value="#785A28"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- COMBO MÁS GRANDE -->
+        <Style x:Key="LolCombo" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1A2530"/>
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Setter Property="BorderBrush" Value="#785A28"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- DATAGRID MÁS GRANDE -->
+        <Style x:Key="LolDataGrid" TargetType="DataGrid">
+            <Setter Property="Background" Value="#0F1923"/>
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Setter Property="RowHeight" Value="38"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#785A28"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="RowBackground" Value="#0F1923"/>
+            <Setter Property="AlternatingRowBackground" Value="#16202B"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#111822"/>
+            <Setter Property="Foreground" Value="#C8AA6E"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="#0F1923"/>
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#17344F"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#2A3A4A"/>
+                    <Setter Property="Foreground" Value="#F0C75E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </Page.Resources>
+
+    <Grid Margin="25">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <!-- 👇 NUEVA FILA PAGINACIÓN -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0"
+                Background="#111822"
+                BorderBrush="#C8AA6E"
+                BorderThickness="2"
+                CornerRadius="10"
+                Padding="20"
+                Margin="0,0,0,18">
+
+            <StackPanel>
+                <TextBlock Text="⚔ GESTIÓN DE CITAS"
+                           FontSize="30"
+                           FontWeight="Bold"
+                           Foreground="#C8AA6E"
+                           Margin="0,0,0,12"/>
+
+                <WrapPanel Margin="0,0,0,12">
+                    <Button Content="Nueva" Command="{Binding NuevaCitaCommand}" Style="{StaticResource LolButton}"/>
+                    <Button Content="Editar" Command="{Binding EditarCitaCommand}" Style="{StaticResource LolButton}"/>
+                    <Button Content="Eliminar" Command="{Binding EliminarCitaCommand}" Style="{StaticResource LolButton}"/>
+                    <Button Content="Ver" Command="{Binding VerCitaCommand}" Style="{StaticResource LolButton}"/>
+                    <Button Content="Refrescar" Command="{Binding RefrescarCommand}" Style="{StaticResource LolButton}"/>
+                    <Button Content="Restaurar" Command="{Binding RestaurarCitaCommand}" Style="{StaticResource LolButton}"/>
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Text="Buscar:"
+                               Foreground="#C8AA6E"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Margin="0,0,8,0"/>
+
+                    <TextBox Width="200"
+                             Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource LolTextBox}"
+                             Margin="0,0,15,0"/>
+
+                    <TextBlock Text="Motor:"
+                               Foreground="#C8AA6E"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Margin="0,0,8,0"/>
+
+                    <ComboBox Width="120"
+                              ItemsSource="{Binding Motores}"
+                              SelectedItem="{Binding MotorSeleccionado}"
+                              Style="{StaticResource LolCombo}"
+                              Margin="0,0,15,0"/>
+
+                    <TextBlock Text="Desde:" Foreground="#C8AA6E" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding FechaInicio}" Margin="6,7,15,0"/>
+
+                    <TextBlock Text="Hasta:" Foreground="#C8AA6E" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding FechaFin}" Margin="6,7,15,0"/>
+
+                    <CheckBox Content="Mostrar eliminados"
+                              IsChecked="{Binding MostrarEliminados}"
+                              Foreground="#F0E6D2"
+                              FontSize="14"
+                              VerticalAlignment="Center"/>
+
+                </WrapPanel>
+
+            </StackPanel>
+        </Border>
+
+        <!-- TABLA -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Citas}"
+                  SelectedItem="{Binding CitaSeleccionada}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Style="{StaticResource LolDataGrid}"
+                  Margin="0,0,0,15">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Matrícula" Binding="{Binding Matricula}" Width="120"/>
+                <DataGridTextColumn Header="Marca" Binding="{Binding Marca}" Width="140"/>
+                <DataGridTextColumn Header="Cilindrada" Binding="{Binding Cilindrada}" Width="100"/>
+                <DataGridTextColumn Header="Motor" Binding="{Binding TipoMotor}" Width="110"/>
+                <DataGridTextColumn Header="DNI" Binding="{Binding DniPropietario}" Width="120"/>
+                <DataGridTextColumn Header="Matriculación" Binding="{Binding FechaMatriculacion}" Width="160"/>
+                <DataGridTextColumn Header="Inspección" Binding="{Binding FechaInspeccion}" Width="160"/>
+                <DataGridCheckBoxColumn Header="Elim." Binding="{Binding IsDeleted}" Width="80"/>
+            </DataGrid.Columns>
+
+        </DataGrid>
+
+        <!-- 👇 PAGINACIÓN NUEVA (SIN TOCAR LO DEMÁS) -->
+        <Border Grid.Row="4"
+                Background="#111822"
+                BorderBrush="#C8AA6E"
+                BorderThickness="2"
+                CornerRadius="10"
+                Padding="12">
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+
+                <Button Content="««"
+                        Command="{Binding PrimeraPaginaCommand}"
+                        Style="{StaticResource LolButton}"/>
+
+                <Button Content="«"
+                        Command="{Binding PaginaAnteriorCommand}"
+                        Style="{StaticResource LolButton}"/>
+
+                <TextBlock Foreground="#F0E6D2"
+                           VerticalAlignment="Center"
+                           Margin="15,0"
+                           FontSize="14">
+                    <Run Text="Página "/>
+                    <Run Text="{Binding PaginaActual}" FontWeight="Bold"/>
+                    <Run Text=" de "/>
+                    <Run Text="{Binding TotalPaginas}" FontWeight="Bold"/>
+                </TextBlock>
+
+                <Button Content="»"
+                        Command="{Binding PaginaSiguienteCommand}"
+                        Style="{StaticResource LolButton}"/>
+
+                <Button Content="»»"
+                        Command="{Binding UltimaPaginaCommand}"
+                        Style="{StaticResource LolButton}"/>
+
+                <TextBlock Text="{Binding EstadoMensaje}"
+                           Foreground="#C8AA6E"
+                           VerticalAlignment="Center"
+                           Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>

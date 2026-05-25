@@ -5,6 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ITV_Avanzado.Front.View.AcercaDe;
 using ITV_Avanzado.Front.View.Backup;
+using ITV_Avanzado.Front.View.Cita;
+using ITV_Avanzado.Front.View.DashBoard;
+using ITV_Avanzado.Front.View.Informe;
 using ITV_Avanzado.Service.Buckup;
 using ITV_Avanzado.Service.Citas;
 using ITV_Avanzado.Service.Dialogs;
@@ -44,20 +47,20 @@ public partial class MainViewModel(
 
     public event NavigateDelegate? OnNavigateRequested;
     
-    //[RelayCommand]
-    // private void NavigateToDashboard() {
-    //     OnNavigateRequested?.Invoke(new DashboardView());
-    // }
+    [RelayCommand]
+     private void NavigateToDashboard() {
+         OnNavigateRequested?.Invoke(new DashBoardView());
+     }
 
-    // [RelayCommand]
-    // private void NavigateToCitas() {
-    //     OnNavigateRequested?.Invoke(new CitaView());
-    // }
-    //
-    // [RelayCommand]
-    // private void NavigateToInformes() {
-    //     OnNavigateRequested?.Invoke(new InformeView());
-    // }
+    [RelayCommand]
+    private void NavigateToCitas() {
+        OnNavigateRequested?.Invoke(new CitaView());
+    }
+    
+    [RelayCommand]
+    private void NavigateToInformes() {
+        OnNavigateRequested?.Invoke(new InformeView());
+    }
     //
     // [RelayCommand]
     // private void NavigateToGraficos() {
@@ -73,13 +76,8 @@ public partial class MainViewModel(
     // private void NavigateToImportExport() {
     //     OnNavigateRequested?.Invoke(new ImportExportView());
     // }
-    
-    // [RelayCommand]
-    // private void CambiarTema() {
-    //     IsDarkTheme = !IsDarkTheme;
-    //     ApplyTheme(IsDarkTheme ? "Dark" : "Light");
-    // }
-
+    //
+    //
     // [RelayCommand]
     // private void Salir() {
     //     if (_dialogService.ShowConfirmation("¿Estás seguro de que quieres salir?", "Confirmar salida")) {

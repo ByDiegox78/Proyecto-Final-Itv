@@ -36,11 +36,11 @@
                 Cilindrada = dto.Cilindrada,
                 TipoMotor = Enum.TryParse(dto.TipoMotor, out Motor tipo) ? tipo : Motor.Diesel,
                 DniPropietario = dto.DniPropietario,
-                FechaMatriculacion = dateTime,
-                FechaInspeccion = dateTime,
+                FechaMatriculacion = DateTime.Parse(dto.FechaMatriculacion, InvariantCulture),
+                FechaInspeccion = DateTime.Parse(dto.FechaInspeccion, InvariantCulture),
                 IsDeleted = dto.IsDelete,
-                CreatedAt = dateTime,
-                UpdatedAt = dateTime
+                CreatedAt = DateTime.Parse(dto.CreatedAt, InvariantCulture),
+                UpdatedAt = DateTime.Parse(dto.UpdatedAt, InvariantCulture)
             };
         }
 
