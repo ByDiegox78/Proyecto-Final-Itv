@@ -3,7 +3,7 @@
 namespace ITV_Avanzado.Entity;
 
 public class AppDbContext : DbContext {
-    public DbSet<VehiculoEntity> Vehiculos { get; set; } = null!;
+    public DbSet<CitaEntity> Citas { get; set; } = null!;
 
     private readonly string _connectionString;
 

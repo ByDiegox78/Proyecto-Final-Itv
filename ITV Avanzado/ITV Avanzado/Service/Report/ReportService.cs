@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using CSharpFunctionalExtensions;
 using GestionItv.Models;
+using ITV_Avanzado.Error.Citas;
 using ITV_Avanzado.Error.Common;
 using ITV_Avanzado.Error.Report;
-using ITV_Avanzado.Error.Vehiculos;
 using Serilog;
 
 namespace ITV_Avanzado.Service.Report;
@@ -18,7 +18,7 @@ public class ReportService : IReportService{
         _logger.Debug("Inicializando la clase ReportService con directorio {Directory}", _reportDirectory);
     }
     
-    public Informe GenerarInformeCita(IEnumerable<Vehiculo> citas) {
+    public Informe GenerarInformeCita(IEnumerable<Cita> citas) {
         _logger.Information("Generando modelo informe de citas.");
 
         var list = citas.ToList();
@@ -37,7 +37,7 @@ public class ReportService : IReportService{
         };
     }
 
-    public Result<string, DomainError> GenerarInformeCitaHtml(IEnumerable<Vehiculo> citas, bool mostrarEliminados = false) {
+    public Result<string, DomainError> GenerarInformeCitaHtml(IEnumerable<Cita> citas, bool mostrarEliminados = false) {
         try {
             var list = mostrarEliminados ? citas : citas.Where(c => !c.IsDeleted);
             var stats = GenerarInformeCita(citas);
@@ -88,7 +88,7 @@ public class ReportService : IReportService{
             return Result.Success<string, DomainError>(html);
         }
         catch (Exception e) {
-            return Result.Failure<string, DomainError>(VehiculoErrors.DatabaseError($"Error al generar HTML: {e.Message}"));
+            return Result.Failure<string, DomainError>(CitaErrors.DatabaseError($"Error al generar HTML: {e.Message}"));
         }
     }
 
@@ -98,7 +98,7 @@ public class ReportService : IReportService{
             return Result.Success<bool, DomainError>(true);
         }
         catch (Exception ex) {
-            return Result.Failure<bool, DomainError>(VehiculoErrors.DatabaseError($"No se pudo guardar el archivo: {ex.Message}"));
+            return Result.Failure<bool, DomainError>(CitaErrors.DatabaseError($"No se pudo guardar el archivo: {ex.Message}"));
         }
     }
 
@@ -140,7 +140,7 @@ public class ReportService : IReportService{
             return Result.Success<bool, DomainError>(true);
         }
         catch (Exception ex) {
-            return Result.Failure<bool, DomainError>(VehiculoErrors.DatabaseError($"Error en conversión PDF: {ex.Message}"));
+            return Result.Failure<bool, DomainError>(CitaErrors.DatabaseError($"Error en conversión PDF: {ex.Message}"));
         }
     }
 }

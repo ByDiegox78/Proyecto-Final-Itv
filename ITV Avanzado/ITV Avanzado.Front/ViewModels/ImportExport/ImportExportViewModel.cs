@@ -154,7 +154,7 @@ public partial class ImportExportViewModel(
                 PropertyNameCaseInsensitive = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-            var personas = JsonSerializer.Deserialize<IEnumerable<Vehiculo>>(json, options);
+            var personas = JsonSerializer.Deserialize<IEnumerable<GestionItv.Models.Cita>>(json, options);
 
             if (personas != null) {
                 var count = 0;
@@ -198,7 +198,7 @@ public partial class ImportExportViewModel(
 
             if (dialog.ShowDialog() == true) {
                 var personas = _citasService.GetAll(1, 1000, false);
-                var xmlSerializer = new XmlSerializer(typeof(List<Vehiculo>));
+                var xmlSerializer = new XmlSerializer(typeof(List<GestionItv.Models.Cita>));
                 using var writer = new StreamWriter(dialog.FileName);
                 xmlSerializer.Serialize(writer, personas.ToList());
 
@@ -230,9 +230,9 @@ public partial class ImportExportViewModel(
 
             if (SustituirDatos) _citasService.DeleteAll();
 
-            var xmlSerializer = new XmlSerializer(typeof(List<Vehiculo>));
+            var xmlSerializer = new XmlSerializer(typeof(List<GestionItv.Models.Cita>));
             using var reader = new StreamReader(dialog.FileName);
-            var personas = (List<Vehiculo>?)xmlSerializer.Deserialize(reader);
+            var personas = (List<GestionItv.Models.Cita>?)xmlSerializer.Deserialize(reader);
 
             if (personas != null) {
                 var count = 0;

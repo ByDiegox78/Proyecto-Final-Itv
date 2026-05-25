@@ -32,8 +32,5 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Service\Dialogs\" />
-    </ItemGroup>
 
 </Project>

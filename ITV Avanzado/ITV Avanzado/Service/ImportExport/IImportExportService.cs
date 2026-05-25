@@ -5,11 +5,11 @@ using ITV_Avanzado.Error.Common;
 namespace ITV_Avanzado.Service.ImportExport;
 
 public interface IImportExportService {
-    Result<int, DomainError> ExportarDatos(IEnumerable<Vehiculo> citas, string path);
+    Result<int, DomainError> ExportarDatos(IEnumerable<Cita> citas, string path);
     
-    Result<IEnumerable<Vehiculo>, DomainError> ImportarDatos(string path);
+    Result<IEnumerable<Cita>, DomainError> ImportarDatos(string path);
     
-    Result<int, DomainError> ExportarDatosSistema(IEnumerable<Vehiculo> citas);
+    Result<int, DomainError> ExportarDatosSistema(IEnumerable<Cita> citas);
     
-    Result<IEnumerable<Vehiculo>, DomainError> ImportarDatosSistema(string path);
+    Result<IEnumerable<Cita>, DomainError> ImportarDatosSistema(string path);
 }

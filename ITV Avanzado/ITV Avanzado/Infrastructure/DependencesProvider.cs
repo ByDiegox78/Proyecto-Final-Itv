@@ -18,8 +18,8 @@ using ITV_Avanzado.Storage.Common;
 using ITV_Avanzado.Storage.Csv;
 using ITV_Avanzado.Storage.Json;
 using ITV_Avanzado.Storage.Xml;
+using ITV_Avanzado.Validator.Citas;
 using ITV_Avanzado.Validator.Common;
-using ITV_Avanzado.Validator.Vehiculos;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,37 +45,37 @@ public class DependencesProvider {
     }
 
     private static void RegisterStorages(IServiceCollection service) {
-        service.AddTransient<IStorage<Vehiculo>>(sp => {
+        service.AddTransient<IStorage<Cita>>(sp => {
             var type = AppConfig.StorageType.ToLower();
             return type switch {
-                "json" => new VehiculoJsonStorage(),
-                "csv" => new VehiculoCsvStorage(),
-                "bin" or "binary" => new VehiculoBinaryStorage(),
-                "xml" => new VehiculoXmlStorage(),
-                _ => new VehiculoJsonStorage()
+                "json" => new CitasJsonStorage(),
+                "csv" => new CitasCsvStorage(),
+                "bin" or "binary" => new CitasBinaryStorage(),
+                "xml" => new CitasXmlStorage(),
+                _ => new CitasJsonStorage()
             };
         });
     }
     
     private static void RegisterRepositories(IServiceCollection services) {
         // Registrar repositorio de personas según configuración
-        services.AddSingleton<IVehiculosRepository>(sp => {
+        services.AddSingleton<ICitaRepository>(sp => {
             var repoType = AppConfig.RepositoryType.ToLower();
             return repoType switch {
-                "memory" => new VehiculosRespositoryMemory(AppConfig.DropData, AppConfig.SeedData),
-                "json" => new VehiculoJsonRepository(
+                "memory" => new CitaRespositoryMemory(AppConfig.DropData, AppConfig.SeedData),
+                "json" => new CitaJsonRepository(
                     Path.Combine(AppConfig.DataFolder, "itv.json"),
                     AppConfig.DropData,
                     AppConfig.SeedData),
-                "binary" => new VehiculoBinaryRepository(Path.Combine(AppConfig.DataFolder, "itv.bin"), AppConfig.DropData, AppConfig.SeedData),
+                "binary" => new CitaBinaryRepository(Path.Combine(AppConfig.DataFolder, "itv.bin"), AppConfig.DropData, AppConfig.SeedData),
                 "dapper" => CreateDapperRepository(AppConfig.DropData, AppConfig.SeedData),
                 "efcore" => CreateEfRepository(AppConfig.DropData, AppConfig.SeedData),
-                "ado" => new VehiculoAdoRepository(AppConfig.DropData, AppConfig.SeedData),
-                _ => new VehiculosRespositoryMemory(AppConfig.DropData, AppConfig.SeedData)
+                "ado" => new CitaAdoRepository(AppConfig.DropData, AppConfig.SeedData),
+                _ => new CitaRespositoryMemory(AppConfig.DropData, AppConfig.SeedData)
             };
         });
     }
-    private static VehiculoEfCoreRepository CreateEfRepository(bool dropData, bool seedData) {
+    private static CitaEfCoreRepository CreateEfRepository(bool dropData, bool seedData) {
         var dataFolder = AppConfig.DataFolder;
         if (!Directory.Exists(dataFolder))
             Directory.CreateDirectory(dataFolder);
@@ -83,10 +83,10 @@ public class DependencesProvider {
         var dbPath = Path.Combine(dataFolder, "itv");
         var context = new AppDbContext($"Data Source={dbPath}");
         
-        return new VehiculoEfCoreRepository(context, dropData, seedData);
+        return new CitaEfCoreRepository(context, dropData, seedData);
     }
 
-    private static VehiculoDapperRepository CreateDapperRepository(bool data, bool seed) {
+    private static CitaDapperRepository CreateDapperRepository(bool data, bool seed) {
         var dataFolder = AppConfig.DataFolder;
         if (!Directory.Exists(dataFolder)) {
             Directory.CreateDirectory(dataFolder);
@@ -95,15 +95,15 @@ public class DependencesProvider {
         var dbPath = Path.Combine(dataFolder, "itv-.db");
         var connection = new SqliteConnection($"Data Source={dbPath}");
         connection.Open();
-        return new VehiculoDapperRepository(connection, () => connection.Close(), data, seed);
+        return new CitaDapperRepository(connection, () => connection.Close(), data, seed);
     }
 
     private static void RegisterValidators(IServiceCollection service) {
-        service.AddTransient<IValidator<Vehiculo>, ValidadorVehiculo>();
+        service.AddTransient<IValidator<Cita>, ValidadorCitas>();
     }
     private static void RegisterCaches(IServiceCollection services) {
-        services.AddSingleton<ICache<int, Vehiculo>>(sp =>
-            new CacheLru<int, Vehiculo>(AppConfig.CacheSize));
+        services.AddSingleton<ICache<int, Cita>>(sp =>
+            new CacheLru<int, Cita>(AppConfig.CacheSize));
     }
     
 
@@ -117,7 +117,7 @@ public class DependencesProvider {
         //services.AddSingleton<IDialogService, DialogService>();
 
         services.AddTransient<IBuckupService, BackupService>(sp =>
-            new BackupService(sp.GetRequiredService<IStorage<Vehiculo>>(), AppConfig.BackupDirectory));
+            new BackupService(sp.GetRequiredService<IStorage<Cita>>(), AppConfig.BackupDirectory));
 
         services.AddTransient<IReportService, ReportService>(sp =>
             new ReportService(AppConfig.ReportDirectory));
@@ -126,9 +126,9 @@ public class DependencesProvider {
 
         services.AddScoped<ICitasService, CitasService>(sp =>
             new CitasService(
-                sp.GetRequiredService<IVehiculosRepository>(),
-                sp.GetRequiredService<IValidator<Vehiculo>>(),
-                sp.GetRequiredService<ICache<int, Vehiculo>>()
+                sp.GetRequiredService<ICitaRepository>(),
+                sp.GetRequiredService<IValidator<Cita>>(),
+                sp.GetRequiredService<ICache<int, Cita>>()
             )
         );
     }

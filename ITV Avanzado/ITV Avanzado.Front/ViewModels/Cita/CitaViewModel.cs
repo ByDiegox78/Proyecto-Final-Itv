@@ -16,7 +16,7 @@ public partial class CitaViewModel : ObservableObject {
     private readonly ICitasService _citasService;
     private readonly IDialogService _dialogService;
     private readonly ILogger _logger = Log.ForContext<CitaViewModel>();
-    private List<Vehiculo> _todosLosVehiculos = [];
+    private List<GestionItv.Models.Cita> _todosLosVehiculos = [];
 
     [ObservableProperty] private string _motorSeleccionado = "TODOS";
     [ObservableProperty] private ObservableCollection<CitaItemViewModel> _citas = [];
@@ -135,7 +135,7 @@ public partial class CitaViewModel : ObservableObject {
         };
     }
 
-    private IEnumerable<Vehiculo> AplicarOrdenamiento(IEnumerable<Vehiculo> lista) {
+    private IEnumerable<GestionItv.Models.Cita> AplicarOrdenamiento(IEnumerable<GestionItv.Models.Cita> lista) {
         return OrdenActual switch {
             TipoOrdenamiento.Matricula => lista.OrderBy(v => v.Matricula),
             TipoOrdenamiento.Dni => lista.OrderBy(v => v.DniPropietario),
@@ -163,7 +163,7 @@ public partial class CitaViewModel : ObservableObject {
 
     [RelayCommand]
     private void NuevaCita() {
-        var nuevaCita = new Vehiculo {
+        var nuevaCita = new GestionItv.Models.Cita {
             Matricula = "",
             Marca = "",
             Cilindrada = 0,
