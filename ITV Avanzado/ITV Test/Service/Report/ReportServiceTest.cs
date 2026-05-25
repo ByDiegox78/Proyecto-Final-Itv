@@ -45,7 +45,7 @@ public class ReportServiceTest {
         [Test]
         public void GenerarInformeCitaHtml_DeberiaIncluirDatosYDiferenciarMotores() {
             var hoy = DateTime.Today;
-            var citas = new List<Vehiculo> {
+            var citas = new List<Cita> {
                 new() { Matricula = "1234BCD", Marca = "Seat", Cilindrada = 1200,
                     TipoMotor = Motor.Gasolina, DniPropietario = "12345678Z",
                     FechaInspeccion = hoy.AddDays(5)
@@ -66,7 +66,7 @@ public class ReportServiceTest {
         }
         [Test]
         public void GenerarInformeCitaHtml_ConBorrados_DeberiaIncluirEliminados() {
-            var citas = new List<Vehiculo> {
+            var citas = new List<Cita> {
                 new() { Matricula = "1234BCD", IsDeleted = true },
                 new() { Matricula = "2345BCF", IsDeleted = false }
             };
@@ -116,7 +116,7 @@ public class ReportServiceTest {
     public class GenerarInformeCitaModelTests : ReportServiceTest {
         [Test]
         public void GenerarInformeCita_ConCitas_DeberiaCalcularEstadisticas() {
-            var citas = new List<Vehiculo> {
+            var citas = new List<Cita> {
                 new() { Id = 1, TipoMotor = Motor.Gasolina, FechaInspeccion = DateTime.Today },
                 new() { Id = 2, TipoMotor = Motor.Diesel, FechaInspeccion = DateTime.Today.AddDays(5) },
                 new() { Id = 3, TipoMotor = Motor.Gasolina, FechaInspeccion = DateTime.Today }
@@ -133,7 +133,7 @@ public class ReportServiceTest {
 
         [Test]
         public void GenerarInformeCita_SinCitas_DeberiaRetornarVacio() {
-            var citas = new List<Vehiculo>();
+            var citas = new List<Cita>();
 
             var resultado = _service.GenerarInformeCita(citas);
 
@@ -145,7 +145,7 @@ public class ReportServiceTest {
 
         [Test]
         public void GenerarInformeCita_ConTodosLosMotores_DeberiaContarCorrectamente() {
-            var citas = new List<Vehiculo> {
+            var citas = new List<Cita> {
                 new() { TipoMotor = Motor.Gasolina },
                 new() { TipoMotor = Motor.Diesel },
                 new() { TipoMotor = Motor.Hibrido },
@@ -164,7 +164,7 @@ public class ReportServiceTest {
     public class GenerarInformeCitaHtmlCompletoTests : ReportServiceTest {
         [Test]
         public void GenerarInformeCitaHtml_ConCitasVariadas_DeberiaGenerarHtmlCompleto() {
-            var citas = new List<Vehiculo> { new() {
+            var citas = new List<Cita> { new() {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", TipoMotor = Motor.Gasolina,
                     DniPropietario = "12345678Z", FechaInspeccion = new DateTime(2026, 5, 20)
                 }, 
@@ -186,7 +186,7 @@ public class ReportServiceTest {
 
         [Test]
         public void GenerarInformeCitaHtml_SinCitas_DeberiaGenerarHtmlVacio() {
-            var citas = new List<Vehiculo>();
+            var citas = new List<Cita>();
 
             var resultado = _service.GenerarInformeCitaHtml(citas);
 

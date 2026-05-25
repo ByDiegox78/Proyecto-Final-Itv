@@ -5,7 +5,7 @@ using ITV_Avanzado.Front.ViewModels.Form;
 namespace ITV_Avanzado.Front.Mapper;
 
 public static class CitaMapper {
-    public static CitaFormData ToFromData(this Vehiculo model) {
+    public static CitaFormData ToFromData(this GestionItv.Models.Cita model) {
         return new CitaFormData {
             Id = model.Id,
             Matricula = model.Matricula,
@@ -21,8 +21,8 @@ public static class CitaMapper {
         };
     }
 
-    public static Vehiculo ToModel(this CitaFormData formData) {
-        return new Vehiculo {
+    public static GestionItv.Models.Cita ToModel(this CitaFormData formData) {
+        return new GestionItv.Models.Cita {
             Id = formData.Id,
             Matricula = formData.Matricula,
             Marca = formData.Marca,
@@ -36,7 +36,7 @@ public static class CitaMapper {
             IsDeleted = formData.IsDeleted
         };
     }
-    public static CitaItemViewModel ToItemViewModel(this Vehiculo model) {
+    public static CitaItemViewModel ToItemViewModel(this GestionItv.Models.Cita model) {
         return new CitaItemViewModel
         {
             Id = model.Id,
@@ -62,8 +62,8 @@ public static class CitaMapper {
     }
 
     // --- De Item de Lista a Modelo de Dominio ---
-    public static Vehiculo ToModel(this CitaItemViewModel item) {
-        return new Vehiculo
+    public static GestionItv.Models.Cita ToModel(this CitaItemViewModel item) {
+        return new GestionItv.Models.Cita
         {
             Id = item.Id,
             Matricula = item.Matricula,

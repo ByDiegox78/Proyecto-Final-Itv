@@ -9,7 +9,7 @@ using Serilog;
 
 namespace ITV_Avanzado.Front.ViewModels.Cita;
 
-public partial class CitaEditVieModel(Vehiculo cita,
+public partial class CitaEditVieModel(GestionItv.Models.Cita cita,
     ICitasService citasService,
     IDialogService dialogService,
     bool isNew) : ObservableObject {

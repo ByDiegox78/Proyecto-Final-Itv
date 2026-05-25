@@ -16,7 +16,7 @@ namespace ITV_Avanzado.Service.Buckup;
 /// </returns>
 public interface IBuckupService {
     Result<string, DomainError> RealizarBackup(
-        IEnumerable<Vehiculo> vehiculos,
+        IEnumerable<Cita> vehiculos,
         string? customBackupDirectory = null);
     
     /// <summary>
@@ -30,7 +30,7 @@ public interface IBuckupService {
     ///     <see cref="BackupErrors.InvalidBackupFile(string)" /> o
     ///     <see cref="BackupErrors.RestorationError(string)" />.
     /// </returns>
-    Result<IEnumerable<Vehiculo>, DomainError> RestaurarBackup(
+    Result<IEnumerable<Cita>, DomainError> RestaurarBackup(
         string archivoBackup,
         string? customImagesDirectory = null);
 
@@ -51,7 +51,7 @@ public interface IBuckupService {
     ///     <see cref="BackupErrors.DirectoryError(string)" /> o
     ///     <see cref="BackupErrors.InvalidBackupFile(string)" />.
     /// </returns>
-    Result<string, DomainError> RealizarBackupSistema(IEnumerable<Vehiculo> vehiculos);
+    Result<string, DomainError> RealizarBackupSistema(IEnumerable<Cita> vehiculos);
 
     /// <summary>
     ///     Restaura un backup completo del sistema.
@@ -70,6 +70,6 @@ public interface IBuckupService {
     Result<int, DomainError> RestaurarBackupSistema(
         string archivoBackup,
         Func<bool> deleteAllCallback,
-        Func<Vehiculo, Result<Vehiculo, DomainError>> createCallback);
+        Func<Cita, Result<Cita, DomainError>> createCallback);
     
 }

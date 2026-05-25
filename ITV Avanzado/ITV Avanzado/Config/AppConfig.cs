@@ -53,7 +53,7 @@ public class AppConfig {
     
     public static int CacheSize => Config.GetValue("Cache:Size", 5);
     
-    public static string ConnectionString => Config.GetValue<string>("Repository:ConnectionString") ?? "Data Source=data/vehiculos.db";
+    public static string ConnectionString => Config.GetValue<string>("Repository:ConnectionString") ?? "Data Source=data/citas.db";
     
     public static bool DropData => Config.GetValue<bool>("Repository:DropData", false);
     

@@ -1,7 +1,7 @@
 ﻿namespace GestionItv.Models;
 
 public record Informe() {
-    public IEnumerable<Vehiculo>? ListadoCitas { get; init; }
+    public IEnumerable<Cita>? ListadoCitas { get; init; }
     
     public int TotalCitas { get; init; }
 

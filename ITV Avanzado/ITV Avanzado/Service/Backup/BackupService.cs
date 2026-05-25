@@ -9,13 +9,13 @@ using Serilog;
 namespace ITV_Avanzado.Service.Buckup;
 
 public class BackupService(
-    IStorage<Vehiculo> storage, 
+    IStorage<Cita> storage, 
     string? defaultBackupDirectory = null
     ) 
     : IBuckupService {
     private readonly ILogger _logger = Log.ForContext<BackupService>();
     
-    public Result<string, DomainError> RealizarBackup(IEnumerable<Vehiculo> vehiculos, string? customBackupDirectory = null) {
+    public Result<string, DomainError> RealizarBackup(IEnumerable<Cita> vehiculos, string? customBackupDirectory = null) {
         var dir = customBackupDirectory ?? defaultBackupDirectory
             ?? throw new InvalidOperationException("No se a dicho un directorio");
         _logger.Information("Iniciando proceso de backup.");
@@ -68,11 +68,11 @@ public class BackupService(
         }
     }
 
-    public Result<IEnumerable<Vehiculo>, DomainError> RestaurarBackup(string archivoBackup, string? customImagesDirectory = null) {
+    public Result<IEnumerable<Cita>, DomainError> RestaurarBackup(string archivoBackup, string? customImagesDirectory = null) {
         _logger.Information("Iniciando restauración desde: {archivo}", archivoBackup);
         if (!File.Exists(archivoBackup)) {
             _logger.Warning("Archivo de backup no encontrado: {path}", archivoBackup);
-            return Result.Failure<IEnumerable<Vehiculo>, DomainError>(BackupErrors.FileNotFound(archivoBackup));
+            return Result.Failure<IEnumerable<Cita>, DomainError>(BackupErrors.FileNotFound(archivoBackup));
         }
 
         var tempDir = Path.Combine(Path.GetTempPath(), $"restore-{Guid.NewGuid()}");
@@ -83,29 +83,29 @@ public class BackupService(
             }
             catch (Exception e) {
                 _logger.Error(e, "Error al extraer el archivo ZIP.");
-                return Result.Failure<IEnumerable<Vehiculo>, DomainError>(
+                return Result.Failure<IEnumerable<Cita>, DomainError>(
                     BackupErrors.InvalidBackupFile("No se pudo extraer el archivo ZIP."));
             }
 
             var dataDir = Path.Combine(tempDir, "data");
 
-            var jsonPath = Path.Combine(dataDir, "vehiculos.json");
+            var jsonPath = Path.Combine(dataDir, "citas.json");
             if (!File.Exists(jsonPath)) {
                 _logger.Warning("El archivo de backup no contiene datos válidos (vehiculos.json no encontrado).");
-                return Result.Failure<IEnumerable<Vehiculo>, DomainError>(
+                return Result.Failure<IEnumerable<Cita>, DomainError>(
                     BackupErrors.InvalidBackupFile("El archivo de backup no contiene datos válidos."));
             }
 
             var cargarResult = storage.Cargar(jsonPath);
             if (cargarResult.IsFailure) {
                 _logger.Error("Error al deserializar los datos del backup.");
-                return Result.Failure<IEnumerable<Vehiculo>, DomainError>(
+                return Result.Failure<IEnumerable<Cita>, DomainError>(
                     BackupErrors.InvalidBackupFile("El archivo de backup contiene datos corruptos."));
             }
 
             var vehiculos = cargarResult.Value.ToList();
             _logger.Information("Datos extraídos del backup correctamente.");
-            return Result.Success<IEnumerable<Vehiculo>, DomainError>(vehiculos);
+            return Result.Success<IEnumerable<Cita>, DomainError>(vehiculos);
         }
         finally {
             if (Directory.Exists(tempDir)) {
@@ -124,11 +124,11 @@ public class BackupService(
             .OrderByDescending(f => File.GetCreationTime(f));
     }
 
-    public Result<string, DomainError> RealizarBackupSistema(IEnumerable<Vehiculo> vehiculos) {
+    public Result<string, DomainError> RealizarBackupSistema(IEnumerable<Cita> vehiculos) {
         return RealizarBackup(vehiculos);
     }
 
-    public Result<int, DomainError> RestaurarBackupSistema(string archivoBackup, Func<bool> deleteAllCallback, Func<Vehiculo, Result<Vehiculo, DomainError>> createCallback) {
+    public Result<int, DomainError> RestaurarBackupSistema(string archivoBackup, Func<bool> deleteAllCallback, Func<Cita, Result<Cita, DomainError>> createCallback) {
         _logger.Information("Iniciando restauración completa del sistema desde: {archivo}", archivoBackup);
         var deleteResult = deleteAllCallback();
         if (!deleteResult) {

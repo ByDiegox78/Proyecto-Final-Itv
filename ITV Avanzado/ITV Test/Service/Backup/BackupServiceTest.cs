@@ -20,7 +20,7 @@
             Directory.CreateDirectory(_backupDir);
             Directory.CreateDirectory(_imagesDir);
 
-            _storageMock = new Mock<IStorage<Vehiculo>>();
+            _storageMock = new Mock<IStorage<Cita>>();
 
             _service = new BackupService(_storageMock.Object, _backupDir);
         }
@@ -35,13 +35,13 @@
         private string _backupDir = null!;
         private string _imagesDir = null!;
         private BackupService _service = null!;
-        private Mock<IStorage<Vehiculo>> _storageMock = null!;
+        private Mock<IStorage<Cita>> _storageMock = null!;
 
         [TestFixture]
         public class CasosPositivos : BackupServiceTest {
             [Test]
             public void RealizarBackup_ConListaVacia_DeberiaRetornarErrorCreationError() {
-                var vehiculos = new List<Vehiculo>();
+                var vehiculos = new List<Cita>();
 
                 var resultado = _service.RealizarBackup(vehiculos);
 
@@ -54,15 +54,15 @@
                 var customDir = Path.Combine(_tempDir, "custom-backup");
                 Directory.CreateDirectory(customDir);
 
-                var vehiculo = new Vehiculo {
+                var vehiculo = new Cita {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
 
-                _storageMock.Setup(s => s.Salvar(It.IsAny<IEnumerable<Vehiculo>>(), It.IsAny<string>()))
+                _storageMock.Setup(s => s.Salvar(It.IsAny<IEnumerable<Cita>>(), It.IsAny<string>()))
                     .Returns(Result.Success<bool, DomainError>(true));
 
-                var resultado = _service.RealizarBackup(new List<Vehiculo> {vehiculo}, customDir);
+                var resultado = _service.RealizarBackup(new List<Cita> {vehiculo}, customDir);
                 
                 resultado.IsSuccess.Should().BeTrue();
                 resultado.Value.Should().StartWith(customDir);
@@ -80,17 +80,17 @@
             }
             [Test]
             public void RestaurarBackup_ConZipValido_DeberiaRetornarPersonas() {
-                var vehiculo = new Vehiculo {
+                var vehiculo = new Cita {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };
 
                 _storageMock.Setup(s => s.Cargar(It.IsAny<string>()))
-                    .Returns(Result.Success<IEnumerable<Vehiculo>, DomainError>(new List<Vehiculo>{ vehiculo}));
+                    .Returns(Result.Success<IEnumerable<Cita>, DomainError>(new List<Cita>{ vehiculo}));
 
                 var zipPath = Path.Combine(_backupDir, "test-back.zip");
                 using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create)) {
-                    zip.CreateEntry("data/vehiculos.json");
+                    zip.CreateEntry("data/citas.json");
                 }
                 
                 var resultado = _service.RestaurarBackup(zipPath);
@@ -106,25 +106,25 @@
             }
             [Test]
             public void RestaurarBackupSistema_ConCallbackExitoso_DeberiaRetornarContador() {
-                var vehiculo = new Vehiculo {
+                var vehiculo = new Cita {
                     Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L",
                     IsDeleted = false, CreatedAt = new DateTime(2024, 01, 17), UpdatedAt = new DateTime(2024, 01, 17)
                 };              
-                var vehiculos = new List<Vehiculo> { vehiculo };
-
+                var vehiculos = new List<Cita> { vehiculo };
+            
                 _storageMock.Setup(s => s.Cargar(It.IsAny<string>()))
-                    .Returns(Result.Success<IEnumerable<Vehiculo>, DomainError>(vehiculos));
-
+                    .Returns(Result.Success<IEnumerable<Cita>, DomainError>(vehiculos));
+            
                 var zipPath = Path.Combine(_backupDir, "test-back.zip");
                 using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create)) {
-                    zip.CreateEntry("data/vehiculos.json");
+                    zip.CreateEntry("data/citas.json");
                 }
-
+            
                 var deleteCallback = () => true;
-                Func<Vehiculo, Result<Vehiculo, DomainError>> callback = p => Result.Success<Vehiculo, DomainError>(p);
-
+                Func<Cita, Result<Cita, DomainError>> callback = p => Result.Success<Cita, DomainError>(p);
+            
                 var resultado = _service.RestaurarBackupSistema(zipPath, deleteCallback, callback);
-
+            
                 resultado.IsSuccess.Should().BeTrue();
                 resultado.Value.Should().Be(1);
             }
@@ -135,7 +135,7 @@
             [Test]
             public void RealizarBackup_SinDirectorio_DeberiaLanzarExcepcion() {
                 var serviceSinDirectorio = new BackupService(_storageMock.Object);
-                var vehiculos = new List<Vehiculo> { new Vehiculo { Id = 1, Matricula = "1234BCD"} };
+                var vehiculos = new List<Cita> { new Cita { Id = 1, Matricula = "1234BCD"} };
 
                 serviceSinDirectorio.Invoking(s => s.RealizarBackup(vehiculos))
                     .Should().Throw<InvalidOperationException>()
@@ -170,7 +170,7 @@
             [Test]
             public void RealizarBackup_ConErrorDeDirectorio_DeberiaRetornarErrorDirectoryError() {
                 var service = new BackupService(_storageMock.Object, "C:\\:invalido\\ruta");
-                var vehiculos = new List<Vehiculo> { new Vehiculo { Id = 1, Matricula = "1234RTY"} };
+                var vehiculos = new List<Cita> { new Cita { Id = 1, Matricula = "1234RTY"} };
 
                 // Act
                 var resultado = service.RealizarBackup(vehiculos, "C:\\:invalido\\ruta");
@@ -183,10 +183,10 @@
             [Test]
             public void RealizarBackup_ConErrorDeEscritura_DeberiaRetornarError() {
                 // Arrange
-                var vehiculos = new List<Vehiculo> { new Vehiculo { Id = 1, Matricula = "1234RTY"} };
+                var vehiculos = new List<Cita> { new Cita { Id = 1, Matricula = "1234RTY"} };
                 var error = new BackupError.CreationError("Error de escritura");
 
-                _storageMock.Setup(s => s.Salvar(It.IsAny<IEnumerable<Vehiculo>>(), It.IsAny<string>()))
+                _storageMock.Setup(s => s.Salvar(It.IsAny<IEnumerable<Cita>>(), It.IsAny<string>()))
                     .Returns(Result.Failure<bool, DomainError>(error));
 
                 // Act
@@ -199,24 +199,24 @@
             [Test]
             public void RestaurarBackupSistema_ConCallbackFallido_DeberiaRetornarError() {
                 // Arrange
-                var vehiculo = new Vehiculo { Id = 1, Matricula = "1234HJK"};
-                var vehiculos = new List<Vehiculo> { vehiculo };
-
+                var vehiculo = new Cita { Id = 1, Matricula = "1234HJK"};
+                var vehiculos = new List<Cita> { vehiculo };
+            
                 _storageMock.Setup(s => s.Cargar(It.IsAny<string>()))
-                    .Returns(Result.Success<IEnumerable<Vehiculo>, DomainError>(vehiculos));
-
+                    .Returns(Result.Success<IEnumerable<Cita>, DomainError>(vehiculos));
+            
                 var zipPath = Path.Combine(_backupDir, "test.zip");
                 using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create)) {
                     zip.CreateEntry("data/personas.json");
                 }
-
+            
                 var deleteCallback = () => true;
-                Func<Vehiculo, Result<Vehiculo, DomainError>> callback = p =>
-                    Result.Failure<Vehiculo, DomainError>(BackupErrors.CreationError("Error al crear vehiculos"));
-
+                Func<Cita, Result<Cita, DomainError>> callback = p =>
+                    Result.Failure<Cita, DomainError>(BackupErrors.CreationError("Error al crear vehiculos"));
+            
                 // Act
                 var resultado = _service.RestaurarBackupSistema(zipPath, deleteCallback, callback);
-
+            
                 // Assert
                 resultado.IsFailure.Should().BeTrue();
                 resultado.Error.Message.Should().Contain("El archivo de backup es inválido o está corrupto: El archivo de backup no contiene datos válidos.");

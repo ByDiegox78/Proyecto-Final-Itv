@@ -6,24 +6,24 @@ namespace ITV_Avanzado.Service.Citas;
 
 public interface ICitasService {
 
-    IEnumerable<Vehiculo> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true, string? campoBusqueda = null);
+    IEnumerable<Cita> GetAll(int page = 1, int pageSize = 10, bool includeDeleted = true, string? campoBusqueda = null);
     
-    Result<Vehiculo, DomainError> GetById(int id);
+    Result<Cita, DomainError> GetById(int id);
 
-    Result<IEnumerable<Vehiculo>, DomainError> GetByMatricula(string matricula);
+    Result<IEnumerable<Cita>, DomainError> GetByMatricula(string matricula);
 
 
-    Result<Vehiculo, DomainError> Save(Vehiculo cita);
+    Result<Cita, DomainError> Save(Cita cita);
 
-    Result<Vehiculo, DomainError> Update(int id, Vehiculo cita);
+    Result<Cita, DomainError> Update(int id, Cita cita);
 
-    Result<Vehiculo, DomainError> Delete(int id, bool isLogical = true);
+    Result<Cita, DomainError> Delete(int id, bool isLogical = true);
 
     bool DeleteAll();
 
-    Result<Vehiculo, DomainError> Restore(int id);
+    Result<Cita, DomainError> Restore(int id);
     
-    IEnumerable<Vehiculo> GetCitasOrderBy(
+    IEnumerable<Cita> GetCitasOrderBy(
         TipoOrdenamiento ordenamiento, 
         int page = 1, 
         int pageSize = 10, 
