@@ -130,7 +130,6 @@
                     <Button Content="Editar" Command="{Binding EditarCitaCommand}" Style="{StaticResource LolButton}"/>
                     <Button Content="Eliminar" Command="{Binding EliminarCitaCommand}" Style="{StaticResource LolButton}"/>
                     <Button Content="Ver" Command="{Binding VerCitaCommand}" Style="{StaticResource LolButton}"/>
-                    <Button Content="Refrescar" Command="{Binding RefrescarCommand}" Style="{StaticResource LolButton}"/>
                     <Button Content="Restaurar" Command="{Binding RestaurarCitaCommand}" Style="{StaticResource LolButton}"/>
                 </WrapPanel>
                 <WrapPanel>
