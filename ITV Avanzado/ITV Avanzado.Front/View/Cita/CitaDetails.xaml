@@ -1,0 +1,196 @@
+﻿<Window x:Class="ITV_Avanzado.Front.View.Cita.CitaDetails"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Detalles del Vehículo"
+        Height="520" Width="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        FontSize="14"
+        Background="#0B0F1A"
+        Foreground="#C8AA6E">
+
+    <Window.Resources>
+
+        <Style x:Key="DetailLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#A38A4A"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0 0 0 4"/>
+        </Style>
+
+        <!-- NUEVO: valor tipo “card” -->
+        <Style x:Key="DetailValueBox" TargetType="Border">
+            <Setter Property="Background" Value="#121A2A"/>
+            <Setter Property="BorderBrush" Value="#2A2F3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="0 0 0 14"/>
+        </Style>
+
+        <Style x:Key="DetailValueText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#F0E6D2"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Border Margin="15"
+            Background="#121A2A"
+            BorderBrush="#2A2F3A"
+            BorderThickness="1"
+            CornerRadius="10">
+
+        <Grid Margin="20">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <Border Grid.Row="0"
+                    Background="#111822"
+                    BorderBrush="#C8AA6E"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0 0 0 18">
+
+                <StackPanel>
+                    <TextBlock Text="Detalles del Vehículo"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#C8AA6E"/>
+
+                    <TextBlock Text="{Binding Matricula}"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="#F0C75E"
+                               Margin="0 4 0 0"/>
+                </StackPanel>
+
+            </Border>
+
+            <!-- BODY -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          BorderThickness="0">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- helper -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Marca" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding Marca}" Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Cilindrada" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding Cilindrada}" Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Motor" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding TipoMotor}" Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="DNI Propietario" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding DniPropietario}" Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Fec. Matriculación" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="4" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding FechaMatriculacion, StringFormat={}{0:dd/MM/yyyy}}"
+                                   Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Fec. Inspección" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="5" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding FechaInspeccion, StringFormat={}{0:dd/MM/yyyy}}"
+                                   Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                    <!-- Estado tipo badge -->
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Estado" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="6" Grid.Column="1"
+                            CornerRadius="6"
+                            Padding="8"
+                            Margin="0 0 0 14"
+                            Background="#1A2530"
+                            BorderBrush="#2A2F3A"
+                            BorderThickness="1">
+
+                        <TextBlock FontSize="14" FontWeight="Bold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="ACTIVO"/>
+                                    <Setter Property="Foreground" Value="#4CAF50"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDeleted}" Value="True">
+                                            <Setter Property="Text" Value="ELIMINADO"/>
+                                            <Setter Property="Foreground" Value="#F44336"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                    </Border>
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Creado" Style="{StaticResource DetailLabel}"/>
+                    <Border Grid.Row="7" Grid.Column="1" Style="{StaticResource DetailValueBox}">
+                        <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                   Style="{StaticResource DetailValueText}"/>
+                    </Border>
+
+                </Grid>
+
+            </ScrollViewer>
+
+            <!-- FOOTER -->
+            <Border Grid.Row="2"
+                    Background="#111822"
+                    BorderBrush="#2A2F3A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12"
+                    Margin="0 16 0 0">
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                    <Button Content="Cerrar"
+                            Click="OnVolverPanelClick"
+                            Padding="18 6"
+                            FontWeight="Bold"
+                            Background="#1E2A3A"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#2A2F3A"
+                            Cursor="Hand"/>
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+    </Border>
+</Window>

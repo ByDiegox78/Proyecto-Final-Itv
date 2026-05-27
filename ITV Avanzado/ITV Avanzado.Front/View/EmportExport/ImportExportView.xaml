@@ -1,0 +1,201 @@
+﻿<Page x:Class="ITV_Avanzado.Front.View.EmportExport.ImportExportView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:ITV_Avanzado.Front.View.EmportExport"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        mc:Ignorable="d"
+        Title="ImportExportView">
+     <Grid Margin="25">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ================= HEADER ================= -->
+        <Border Grid.Row="0"
+                Background="#121A2A"
+                BorderBrush="#C8AA6E"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="12"
+                Margin="0,0,0,20">
+
+            <StackPanel Orientation="Horizontal">
+
+                <iconPacks:PackIconMaterial Kind="SwapHorizontal"
+                                            Width="30"
+                                            Height="30"
+                                            Foreground="#C8AA6E"
+                                            Margin="0,0,10,0"/>
+
+                <StackPanel>
+                    <TextBlock Text="Importar / Exportar ITV"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#C8AA6E"/>
+
+                    <TextBlock Text="Gestión de datos del sistema ITV VIVES"
+                               FontSize="12"
+                               Foreground="#A38A4A"/>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ================= OPTIONS ================= -->
+        <Border Grid.Row="1"
+                Background="#121A2A"
+                BorderBrush="#2A2F3A"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="12"
+                Margin="0,0,0,20">
+
+            <CheckBox Content="Sustituir datos existentes al importar"
+                      IsChecked="{Binding SustituirDatos}"
+                      Foreground="#C8AA6E"/>
+        </Border>
+
+        <!-- ================= ACTIONS ================= -->
+        <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ================= EXPORT ================= -->
+            <Border Grid.Column="0"
+                    Background="#121A2A"
+                    BorderBrush="#C8AA6E"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Margin="0,0,10,0"
+                    Padding="15">
+
+                <StackPanel>
+
+                    <TextBlock Text="EXPORTAR"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="#C8AA6E"
+                               Margin="0,0,0,15"/>
+
+                    <Button Content="📤 Exportar CSV"
+                            Command="{Binding ExportarCsvCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,0,0,10"/>
+
+                    <Button Content="📤 Exportar JSON"
+                            Command="{Binding ExportarJsonCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,0,0,10"/>
+
+                    <Button Content="📤 Exportar XML"
+                            Command="{Binding ExportarXmlCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"/>
+                    
+                    <Button Content="📦 Exportar BIN"
+                            Command="{Binding ExportarBinarioCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,10,0,0"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- ================= IMPORT ================= -->
+            <Border Grid.Column="1"
+                    Background="#121A2A"
+                    BorderBrush="#C8AA6E"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Margin="10,0,0,0"
+                    Padding="15">
+
+                <StackPanel>
+
+                    <TextBlock Text="IMPORTAR"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="#C8AA6E"
+                               Margin="0,0,0,15"/>
+
+                    <Button Content="📥 Importar CSV"
+                            Command="{Binding ImportarCsvCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,0,0,10"/>
+
+                    <Button Content="📥 Importar JSON"
+                            Command="{Binding ImportarJsonCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,0,0,10"/>
+
+                    <Button Content="📥 Importar XML"
+                            Command="{Binding ImportarXmlCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"/>
+                    <Button Content="📦 Importar BIN"
+                            Command="{Binding ImportarBinarioCommand}"
+                            Background="Transparent"
+                            Foreground="#C8AA6E"
+                            BorderBrush="#C8AA6E"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,10,0,0"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+
+        <!-- ================= STATUS ================= -->
+        <Border Grid.Row="3"
+                Margin="0,20,0,0"
+                Background="#121A2A"
+                BorderBrush="#C8AA6E"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="10">
+
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="#A38A4A"
+                       FontSize="12"
+                       HorizontalAlignment="Center"/>
+        </Border>
+
+    </Grid>
+</Page>

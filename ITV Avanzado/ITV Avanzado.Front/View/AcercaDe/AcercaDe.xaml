@@ -1,0 +1,112 @@
+﻿<Window x:Class="ITV_Avanzado.Front.View.AcercaDe.AcercaDe"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        mc:Ignorable="d"
+        Title="Acerca de"
+        Width="480"
+        Height="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#0B0F1A"
+        Foreground="#C8AA6E">
+
+    <Grid Margin="25">
+
+        <!-- Tarjeta principal -->
+        <Border Background="#121A2A"
+                CornerRadius="12"
+                Padding="20"
+                BorderBrush="#C8AA6E"
+                BorderThickness="1">
+
+            <StackPanel HorizontalAlignment="Center">
+
+                <!-- Título estilo LoL -->
+                <TextBlock Text="ITV VIVES"
+                           FontSize="30"
+                           FontWeight="Bold"
+                           Foreground="#C8AA6E"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,5"/>
+
+                <TextBlock Text="Sistema de gestión de inspección técnica"
+                           FontSize="11"
+                           Foreground="#A38A4A"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
+
+                <!-- Divider -->
+                <Rectangle Height="1"
+                           Fill="#2A2F3A"
+                           Margin="0,0,0,20"/>
+
+                <!-- Desarrollador -->
+                <TextBlock Text="Desarrollado por"
+                           FontSize="13"
+                           Foreground="#A38A4A"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Diego González Manzanero"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#E6D3A3"
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,20"/>
+
+                <!-- GitHub -->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,0">
+
+                    <iconPacks:PackIconMaterial Kind="Github"
+                                                Width="20"
+                                                Height="20"
+                                                Foreground="#C8AA6E"
+                                                Margin="0,0,10,0"/>
+
+                    <TextBlock Text="Repositorio"
+                               FontSize="13"
+                               Foreground="#A38A4A"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Link -->
+                <TextBlock x:Name="RepoLink"
+                           Text="github.com/ByDiegox78"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#C8AA6E"
+                           TextDecorations="Underline"
+                           Cursor="Hand"
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,20"
+                           MouseLeftButtonDown="OnGithubClick"/>
+
+                <!-- Botón -->
+                <Button Content="Cerrar"
+                        Click="OnCerrar"
+                        Width="140"
+                        Padding="8"
+                        Background="#C8AA6E"
+                        Foreground="#0B0F1A"
+                        FontWeight="Bold"
+                        BorderThickness="0">
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

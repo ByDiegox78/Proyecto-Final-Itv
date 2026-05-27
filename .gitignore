@@ -1,0 +1,51 @@
+
+# Archivos de compilación
+bin/
+obj/
+out/
+
+# Datos generados en tiempo de ejecución
+data/
+**/data/
+
+# Configuración de IDEs
+.idea/
+.vs/
+*.sln.iml
+*.DotSettings.user
+
+# Archivos temporales o locales
+*.user
+
+# Logs de la aplicación
+log/
+**/log/
+*.suo
+*.userprefs
+*.log
+*.dbmdl
+*.cache
+*.pdb
+
+# Paquetes y artefactos de NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+project.assets.json
+packages/
+artifacts/
+
+# Publicaciones y resultados de test
+publish/
+TestResults/
+BenchmarkDotNet.Artifacts/
+coveragereport/
+
+# Archivos específicos de Visual Studio
+*.csproj.user
+.vshistory/
+
+# Otros
+*.tmp
+*.bak
