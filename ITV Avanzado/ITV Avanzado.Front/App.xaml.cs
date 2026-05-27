@@ -74,8 +74,6 @@ public partial class App : Application {
         Log.Error(e.Exception, "Exception en tarea");
         e.SetObserved();
     }
-    
-    
     protected override void OnExit(ExitEventArgs e) {
         Log.Information("Aplicacion cerrandose");
         Log.CloseAndFlush();

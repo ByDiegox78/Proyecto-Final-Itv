@@ -12,9 +12,5 @@ public partial class CitaView : Page {
         var vm = App.Services.GetRequiredService<CitaViewModel>();
         DataContext = vm;
     }
-
-    // private void OnCitaClick(object sender, MouseButtonEventArgs e) {
-    //     if (DataContext is CitaViewModel vm && vm.ViewCommand.Execute(null)) vm.ViewCommand.CanExecute(null);
-    // }
     
 }

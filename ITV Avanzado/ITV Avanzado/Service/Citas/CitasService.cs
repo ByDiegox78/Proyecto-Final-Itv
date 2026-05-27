@@ -43,11 +43,6 @@ public class CitasService(
     /// <inheritdoc cref="ICitasService.Save(Cita)" />
     public Result<Cita, DomainError> Save(Cita cita) {
         return ValidarCita(cita)
-            .Ensure(v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.FechaInspeccion.Date == v.FechaInspeccion.Date),
-                v => CitaErrors.MatriculaInspeccionDuplicada(v.Matricula))
-            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null!)
-                    .Count(x => x.DniPropietario == v.DniPropietario && x.FechaInspeccion.Date == v.FechaInspeccion.Date) < 3,
-                v => CitaErrors.MaxCitasUsageDniError(v.DniPropietario))
             .Bind(v => repository.Create(v))
             .Tap(creada => cache.Add(creada.Id, creada));
     }
@@ -58,13 +53,6 @@ public class CitasService(
                 cache.Remove(id);
             })
             .Bind(_ => ValidarCita(cita))
-            .Ensure(
-                v => !repository.GetByMatricula(v.Matricula)!.Any(x => x.Id != id && x.FechaInspeccion.Date == v.FechaInspeccion.Date),
-                v => CitaErrors.MatriculaInspeccionDuplicada(v.Matricula))
-            .Ensure(v => repository.GetAll(1, int.MaxValue, false, null!)
-                    .Count(x => x.Id != id && x.DniPropietario == v.DniPropietario &&
-                                x.FechaInspeccion.Date == v.FechaInspeccion.Date) < 3,
-                v => CitaErrors.MaxCitasUsageDniError(v.DniPropietario))
             .Bind(p => repository.Update(id, p));
     }
     /// <inheritdoc cref="ICitasService.Delete(int, bool)" />

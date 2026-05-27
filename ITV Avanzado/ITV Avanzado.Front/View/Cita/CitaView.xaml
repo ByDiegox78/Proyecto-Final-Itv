@@ -10,9 +10,7 @@
       Background="#0A101A">
 
     <Page.Resources>
-
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-
+        
         <!-- BOTONES MÁS GRANDES -->
         <Style x:Key="LolButton" TargetType="Button">
             <Setter Property="Background" Value="#102030"/>
@@ -190,9 +188,9 @@
                 <DataGridTextColumn Header="Marca" Binding="{Binding Marca}" Width="140"/>
                 <DataGridTextColumn Header="Cilindrada" Binding="{Binding Cilindrada}" Width="100"/>
                 <DataGridTextColumn Header="Motor" Binding="{Binding TipoMotor}" Width="110"/>
-                <DataGridTextColumn Header="DNI" Binding="{Binding DniPropietario}" Width="120"/>
-                <DataGridTextColumn Header="Matriculación" Binding="{Binding FechaMatriculacion}" Width="160"/>
-                <DataGridTextColumn Header="Inspección" Binding="{Binding FechaInspeccion}" Width="160"/>
+                <DataGridTextColumn Header="DNI" Binding="{Binding DniPropietario}" Width="100"/>
+                <DataGridTextColumn Header="Matriculación" Binding="{Binding FechaMatriculacion, StringFormat=\dd/MM/yyyy}" Width="120"/>
+                <DataGridTextColumn Header="Inspección" Binding="{Binding FechaInspeccion, StringFormat=\dd/MM/yyyy}" Width="120"/>
                 <DataGridCheckBoxColumn Header="Elim." Binding="{Binding IsDeleted}" Width="80"/>
             </DataGrid.Columns>
 

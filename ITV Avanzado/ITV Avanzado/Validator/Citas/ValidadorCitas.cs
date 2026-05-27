@@ -35,7 +35,7 @@ namespace ITV_Avanzado.Validator.Citas;
                 errores.Add("El dni del dueño no tiene el formato correcto");
             }
 
-            if (entidad.FechaMatriculacion > DateTime.UtcNow.Date) {
+            if (entidad.FechaMatriculacion > DateTime.Today.Date) {
                 errores.Add("La fecha de matriculación no puede ser futura a la fecha actual");
             }
 
