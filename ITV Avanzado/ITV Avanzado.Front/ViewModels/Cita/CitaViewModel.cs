@@ -253,6 +253,7 @@ public partial class CitaViewModel : ObservableObject {
         TamanoPagina = 10;
         OrdenActual = TipoOrdenamiento.Matricula;
         PaginaActual = 1;
+        LoadCitas();
     }
 
     [RelayCommand]

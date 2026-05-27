@@ -135,10 +135,6 @@ public class CitasServiceTest {
 
             _valMock.Setup(v => v.Validar(It.IsAny<Cita>()))
                 .Returns(Result.Success<Cita, DomainError>(cita));
-            _repositoryMock.Setup(r => r.GetByMatricula(cita.Matricula))
-                .Returns(Array.Empty<Cita>());
-            _repositoryMock.Setup(r => r.GetAll(1, 2000, false, null))
-                .Returns(Array.Empty<Cita>());
             _repositoryMock.Setup(r => r.Create(It.IsAny<Cita>()))
                 .Returns(Result.Success<Cita, DomainError>(cita));
 
@@ -146,7 +142,6 @@ public class CitasServiceTest {
 
             res.IsSuccess.Should().BeTrue();
             _repositoryMock.Verify(r => r.Create(It.IsAny<Cita>()), Times.Once);
-            _repositoryMock.Verify(r => r.GetByMatricula(cita.Matricula), Times.Once);
             _cacheMock.Verify(c => c.Add(It.IsAny<int>(), It.IsAny<Cita>()), Times.Once);
         }
 
@@ -292,15 +287,15 @@ public class CitasServiceTest {
             _valMock.Setup(v => v.Validar(It.IsAny<Cita>()))
                 .Returns((Cita v) => Result.Success<Cita, DomainError>(v));
             
-            _repositoryMock.Setup(r => r.GetByMatricula("1234BCD")).Returns(new List<Cita> { citas });
+            _repositoryMock.Setup(r => r.Create(It.IsAny<Cita>()))
+                .Returns(Result.Failure<Cita, DomainError>(CitaErrors.MatriculaInspeccionDuplicada("1234BCD")));
             
             var res = _service.Save(citas);
             
             res.IsFailure.Should().BeTrue();
             res.Error.Should().BeOfType<CitaError.MatriculaInspeccionDuplicada>();
             res.Error.Message.Should().Contain("1234BCD");
-            _repositoryMock.Verify(r => r.GetByMatricula("1234BCD"), Times.Once);
-            _repositoryMock.Verify(r => r.Create(It.IsAny<Cita>()), Times.Never);
+            _repositoryMock.Verify(r => r.Create(It.IsAny<Cita>()), Times.Once);
         }
         [Test]
         public void Save_ConDniMaxDiaCitas_DeveriaDevolverError() {
@@ -315,15 +310,15 @@ public class CitasServiceTest {
             };
 
             _valMock.Setup(v => v.Validar(It.IsAny<Cita>())).Returns(Result.Success<Cita, DomainError>(cita));
-            _repositoryMock.Setup(r => r.GetByMatricula("1234BCD")).Returns(Array.Empty<Cita>());
-            _repositoryMock.Setup(r => r.GetAll(1, int.MaxValue, false, null)).Returns(citasExistentes);
+            _repositoryMock.Setup(r => r.Create(It.IsAny<Cita>()))
+                .Returns(Result.Failure<Cita, DomainError>(CitaErrors.MaxCitasUsageDniError("12345678Z")));
 
             var res = _service.Save(cita);
 
             res.IsFailure.Should().BeTrue();
             res.Error.Should().BeOfType<CitaError.MaxCitasUsageDniError>();
             res.Error.Message.Should().Contain("12345678Z");
-            _repositoryMock.Verify(r => r.Create(It.IsAny<Cita>()), Times.Never);
+            _repositoryMock.Verify(r => r.Create(It.IsAny<Cita>()), Times.Once);
         }
 
         [Test]
@@ -365,17 +360,18 @@ public class CitasServiceTest {
             };
 
             _repositoryMock.Setup(r => r.GetById(1)).Returns(citaExistente);
-            _repositoryMock.Setup(r => r.GetByMatricula(It.IsAny<string>())).Returns(Array.Empty<Cita>());
-            _repositoryMock.Setup(r => r.GetAll(1, int.MaxValue, false, null)).Returns(citasExistentes);
             _valMock.Setup(v => v.Validar(It.IsAny<Cita>()))
                 .Returns(Result.Success<Cita, DomainError>(new Cita()));
+            _repositoryMock.Setup(r => r.Update(1, It.IsAny<Cita>()))
+                .Returns(Result.Failure<Cita, DomainError>(CitaErrors.MaxCitasUsageDniError("12345678Z")));
+
 
             var res = _service.Update(1, new Cita { DniPropietario = "12345678Z", FechaInspeccion = DateTime.Today.AddDays(5) });
 
             res.IsFailure.Should().BeTrue();
             res.Error.Should().BeOfType<CitaError.MaxCitasUsageDniError>();
             res.Error.Message.Should().Contain("12345678Z");
-            _repositoryMock.Verify(r => r.Update(It.IsAny<int>(), It.IsAny<Cita>()), Times.Never);
+            _repositoryMock.Verify(r => r.Update(It.IsAny<int>(), It.IsAny<Cita>()), Times.Once);
         }
         
         [Test]

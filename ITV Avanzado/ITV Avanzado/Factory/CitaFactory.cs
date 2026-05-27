@@ -14,11 +14,15 @@ public static class CitasFactory {
         var today = now.Date;
         
         return new List<Cita> {
+            new Cita { Id = 0, Matricula = "4196FMR", Marca = "Alfa Romeo", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "54407737H", 
+                FechaMatriculacion = today.AddYears(-5), FechaInspeccion = today, IsDeleted = false, CreatedAt = now, UpdatedAt = now },
             new Cita { Id = 0, Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", 
                 FechaMatriculacion = today.AddYears(-5), FechaInspeccion = today, IsDeleted = false, CreatedAt = now, UpdatedAt = now },
+            new Cita { Id = 0, Matricula = "1234BCD", Marca = "Seat Ibiza", Cilindrada = 1200, TipoMotor = Motor.Gasolina, DniPropietario = "01234567L", 
+                FechaMatriculacion = today.AddYears(-15), FechaInspeccion = today.AddDays(1), IsDeleted = false, CreatedAt = now, UpdatedAt = now },
             
             new Cita { Id = 0, Matricula = "2345BCF", Marca = "Volkswagen Golf", Cilindrada = 1600, TipoMotor = Motor.Diesel, DniPropietario = "12345678Z", 
-                FechaMatriculacion = today.AddYears(-3), FechaInspeccion = today.AddDays(10), IsDeleted = false, CreatedAt = now, UpdatedAt = now },
+                FechaMatriculacion = today.AddYears(-3), FechaInspeccion = today.AddDays(5), IsDeleted = false, CreatedAt = now, UpdatedAt = now },
             
             new Cita { Id = 0, Matricula = "3456BCG", Marca = "Toyota Corolla", Cilindrada = 1800, TipoMotor = Motor.Hibrido, DniPropietario = "12345678Z", 
                 FechaMatriculacion = today.AddYears(-2), FechaInspeccion = today.AddDays(15), IsDeleted = false, CreatedAt = now, UpdatedAt = now },

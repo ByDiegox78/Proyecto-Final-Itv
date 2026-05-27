@@ -113,12 +113,12 @@ public partial class ImportExportViewModel(
             };
 
             if (dialog.ShowDialog() == true) {
-                var personas = _citasService.GetAll(1, 1000, false);
+                var citas = _citasService.GetAll(1, 1000, false);
                 var options = new JsonSerializerOptions {
                     WriteIndented = true,
                     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 };
-                var json = JsonSerializer.Serialize(personas, options);
+                var json = JsonSerializer.Serialize(citas, options);
                 File.WriteAllText(dialog.FileName, json);
 
                 StatusMessage = "Exportación JSON completada";
@@ -154,12 +154,12 @@ public partial class ImportExportViewModel(
                 PropertyNameCaseInsensitive = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-            var personas = JsonSerializer.Deserialize<IEnumerable<GestionItv.Models.Cita>>(json, options);
+            var citas = JsonSerializer.Deserialize<IEnumerable<GestionItv.Models.Cita>>(json, options);
 
-            if (personas != null) {
+            if (citas != null) {
                 var count = 0;
-                foreach (var persona in personas) {
-                    var result = _citasService.Save(persona);
+                foreach (var cita in citas) {
+                    var result = _citasService.Save(cita);
                     if (result.IsSuccess) count++;
                 }
 
@@ -197,10 +197,10 @@ public partial class ImportExportViewModel(
             };
 
             if (dialog.ShowDialog() == true) {
-                var personas = _citasService.GetAll(1, 1000, false);
+                var citas = _citasService.GetAll(1, 1000, false);
                 var xmlSerializer = new XmlSerializer(typeof(List<GestionItv.Models.Cita>));
                 using var writer = new StreamWriter(dialog.FileName);
-                xmlSerializer.Serialize(writer, personas.ToList());
+                xmlSerializer.Serialize(writer, citas.ToList());
 
                 StatusMessage = "Exportación XML completada";
                 _dialogService.ShowSuccess("Exportación XML completada");
@@ -232,12 +232,12 @@ public partial class ImportExportViewModel(
 
             var xmlSerializer = new XmlSerializer(typeof(List<GestionItv.Models.Cita>));
             using var reader = new StreamReader(dialog.FileName);
-            var personas = (List<GestionItv.Models.Cita>?)xmlSerializer.Deserialize(reader);
+            var citas = (List<GestionItv.Models.Cita>?)xmlSerializer.Deserialize(reader);
 
-            if (personas != null) {
+            if (citas != null) {
                 var count = 0;
-                foreach (var persona in personas) {
-                    var result = _citasService.Save(persona);
+                foreach (var c in citas) {
+                    var result = _citasService.Save(c);
                     if (result.IsSuccess) count++;
                 }
 

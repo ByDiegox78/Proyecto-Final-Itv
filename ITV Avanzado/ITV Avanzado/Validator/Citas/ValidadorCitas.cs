@@ -18,7 +18,6 @@ namespace ITV_Avanzado.Validator.Citas;
                 errores.Add("La marca debe contener al manos 2 carazteres");
                 
             }
-            bool estaEnRangoValido = entidad.Cilindrada >= 800 && entidad.Cilindrada <= 3000;
             if (entidad.TipoMotor == Motor.Electrico) {
                 if (entidad.Cilindrada != 0)
                     errores.Add("La cilindrada debe ser 0 en vehículos eléctricos");
@@ -35,7 +34,7 @@ namespace ITV_Avanzado.Validator.Citas;
                 errores.Add("El dni del dueño no tiene el formato correcto");
             }
 
-            if (entidad.FechaMatriculacion > DateTime.UtcNow.Date) {
+            if (entidad.FechaMatriculacion > DateTime.Today.Date) {
                 errores.Add("La fecha de matriculación no puede ser futura a la fecha actual");
             }
 

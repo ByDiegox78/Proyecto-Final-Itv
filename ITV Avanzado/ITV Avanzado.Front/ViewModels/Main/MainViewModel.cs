@@ -61,30 +61,11 @@ public partial class MainViewModel(
     private void NavigateToInformes() {
         OnNavigateRequested?.Invoke(new InformeView());
     }
-    //
-    // [RelayCommand]
-    // private void NavigateToGraficos() {
-    //     OnNavigateRequested?.Invoke(new GraficoView());
-    // }
-    //
+
     [RelayCommand]
     private void NavigateToBackup() {
         OnNavigateRequested?.Invoke(new BackupView());
     }
-    //
-    // [RelayCommand]
-    // private void NavigateToImportExport() {
-    //     OnNavigateRequested?.Invoke(new ImportExportView());
-    // }
-    //
-    //
-    // [RelayCommand]
-    // private void Salir() {
-    //     if (_dialogService.ShowConfirmation("¿Estás seguro de que quieres salir?", "Confirmar salida")) {
-    //         _logger.Information("👋 Usuario cerró la aplicación");
-    //         MediaTypeNames.Application.Current.Shutdown();
-    //     }
-    // }
 
     [RelayCommand]
     private void MostrarAcercaDe() {
@@ -92,24 +73,4 @@ public partial class MainViewModel(
         aboutWindow.ShowDialog();
     }
     
-    // private void ApplyTheme(string themeName) {
-    //     try {
-    //         var themeUri = new Uri($"../Themes/{themeName}Theme.xaml", UriKind.Relative);
-    //         var themeDictionary = new ResourceDictionary { Source = themeUri };
-    //
-    //         var appResources = MediaTypeNames.Application.Current.Resources.MergedDictionaries;
-    //
-    //         for (var i = appResources.Count - 1; i >= 0; i--) {
-    //             var dict = appResources[i];
-    //             if (dict.Source != null && dict.Source.OriginalString.Contains("Theme")) appResources.RemoveAt(i);
-    //         }
-    //
-    //         appResources.Add(themeDictionary);
-    //
-    //         _logger.Information("✅ Tema cambiado a {Theme}", themeName);
-    //     }
-    //     catch (Exception ex) {
-    //         _logger.Error(ex, "❌ Error al aplicar el tema");
-    //     }
-    // }
 }
